@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HH NYC">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Happy Hour NYC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0c10;
+      --surface: #13131a;
+      --surface-2: #1c1c26;
+      --surface-3: #23232f;
+      --border: #2a2a38;
+      --border-subtle: #1e1e28;
+      --text: #ede9e0;
+      --text-2: #8c8899;
+      --text-3: #504d5e;
+      --accent: #f5a623;
+      --accent-dim: rgba(245,166,35,0.12);
+      --accent-border: rgba(245,166,35,0.3);
+      --green: #34d27a;
+      --green-dim: rgba(52,210,122,0.1);
+      --green-border: rgba(52,210,122,0.25);
+      --orange: #e8643a;
+      --orange-dim: rgba(232,100,58,0.1);
+      --orange-border: rgba(232,100,58,0.28);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-ui: 'Outfit', -apple-system, sans-serif;
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;-webkit-text-size-adjust:100%}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-ui);overflow:hidden;-webkit-font-smoothing:antialiased}
+    input,select,button,textarea{font-family:var(--font-ui);-webkit-appearance:none;appearance:none}
+    :focus{outline:none}
+    *{-webkit-tap-highlight-color:transparent}
+    ::-webkit-scrollbar{display:none}
+
+    /* ─── APP ─── */
+    #app{display:flex;flex-direction:column;height:100dvh;max-width:480px;margin:0 auto;position:relative;background:var(--bg)}
+
+    /* ─── HEADER ─── */
+    #header{
+      flex-shrink:0;
+      background:rgba(12,12,16,0.95);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border-subtle);
+      padding:0 16px 12px;
+      padding-top:calc(env(safe-area-inset-top,0px) + 12px);
+      z-index:50;
+    }
+    .hrow1{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .logo{
+      font-family:var(--font-display);
+      font-size:18px;
+      font-weight:700;
+      color:var(--text);
+      letter-spacing:-.01em;
+      line-height:1;
+      display:flex;align-items:center;gap:7px;
+    }
+    .logo-icon{font-family:var(--font-ui);font-size:16px}
+    .subtitle{font-family:var(--font-ui);font-size:10px;color:var(--text-3);margin-top:3px;letter-spacing:.02em}
+    .add-btn{
+      background:var(--surface-2);
+      border:1px solid var(--border);
+      border-radius:8px;
+      color:var(--accent);
+      font-size:11px;
+      font-weight:600;
+      padding:6px 11px;
+      cursor:pointer;
+      white-space:nowrap;
+      transition:background .15s, border-color .15s;
+      letter-spacing:.01em;
+    }
+    .add-btn:active{background:var(--surface-3)}
+    .seg{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;gap:1px;padding:2px}
+    .seg-btn{
+      padding:5px 13px;border:none;background:transparent;
+      color:var(--text-3);font-size:12px;font-weight:600;
+      transition:all .15s;cursor:pointer;border-radius:6px;
+      letter-spacing:.01em;
+    }
+    .seg-btn.on{background:var(--surface-3);color:var(--text)}
+    #q{
+      width:100%;padding:10px 14px;
+      background:var(--surface);
+      border:1px solid var(--border-subtle);
+      border-radius:11px;
+      color:var(--text);
+      font-size:14px;
+      margin-bottom:10px;
+      transition:border-color .15s;
+    }
+    #q::placeholder{color:var(--text-3)}
+    #q:focus{border-color:var(--border)}
+
+    /* ─── FILTER PILLS ─── */
+    .frow{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+    .frow::-webkit-scrollbar{display:none}
+    .pill{
+      flex-shrink:0;
+      padding:6px 12px;
+      border:1px solid var(--border-subtle);
+      border-radius:20px;
+      background:var(--surface);
+      color:var(--text-3);
+      font-size:11.5px;
+      font-weight:500;
+      white-space:nowrap;
+      cursor:pointer;
+      transition:all .15s;
+      user-select:none;
+      letter-spacing:.01em;
+    }
+    .pill:active{background:var(--surface-2)}
+    .pill.on{background:var(--green-dim);border-color:var(--green-border);color:var(--green);font-weight:600}
+    .pill.hh-only.on{background:var(--orange-dim);border-color:var(--orange-border);color:var(--orange)}
+    .time-pill{
+      flex-shrink:0;display:flex;align-items:center;gap:4px;
+      padding:6px 10px;
+      border:1px solid var(--border-subtle);
+      border-radius:20px;background:var(--surface);cursor:pointer;
+      transition:all .15s;
+    }
+    .time-pill.on{border-color:var(--green-border);background:var(--green-dim)}
+    .tpl{font-size:11.5px;color:var(--text-3);pointer-events:none;white-space:nowrap;font-weight:500}
+    .time-pill.on .tpl{color:var(--green)}
+    #time-input{background:transparent;border:none;color:var(--green);font-size:11.5px;font-weight:600;font-family:var(--font-ui);width:60px;cursor:pointer;padding:0}
+    .hood-pill{
+      flex-shrink:0;position:relative;
+      padding:6px 12px;
+      border:1px solid var(--border-subtle);
+      border-radius:20px;
+      background:var(--surface);
+      color:var(--text-3);
+      font-size:11.5px;font-weight:500;white-space:nowrap;cursor:pointer;
+      transition:all .15s;
+    }
+    .hood-pill.on{background:var(--green-dim);border-color:var(--green-border);color:var(--green)}
+    #hood-sel{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer;font-size:14px}
+
+    /* ─── CONTENT ─── */
+    #content{flex:1;position:relative;overflow:hidden}
+
+    /* ─── LIST ─── */
+    #list-pane{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:2}
+    #list-pane.gone{visibility:hidden;pointer-events:none}
+
+    .bar-item{
+      display:flex;align-items:flex-start;gap:12px;
+      padding:14px 16px;
+      border-bottom:1px solid var(--border-subtle);
+      cursor:pointer;
+      transition:background .1s;
+      position:relative;
+    }
+    .bar-item:active{background:var(--surface)}
+
+    .bar-dot-wrap{padding-top:5px;flex-shrink:0}
+    .bar-dot{width:8px;height:8px;border-radius:50%;background:var(--surface-3);border:1.5px solid var(--border)}
+    .bar-dot.open{background:var(--green);border-color:var(--green);box-shadow:0 0 8px rgba(52,210,122,0.4)}
+
+    .bar-info{flex:1;min-width:0}
+    .bar-name{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;letter-spacing:-.01em}
+    .bar-sub{font-size:11px;color:var(--text-3);margin-bottom:5px;letter-spacing:.01em}
+    .bar-deal{
+      font-size:12px;
+      color:var(--accent);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      font-weight:500;
+    }
+
+    .bar-right{flex-shrink:0;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+    .open-tag{font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;text-transform:uppercase}
+    .next-tag{font-size:10px;color:var(--text-3)}
+    .hh-badge{
+      display:inline-block;
+      padding:2px 6px;
+      background:var(--orange-dim);
+      border:1px solid var(--orange-border);
+      border-radius:5px;
+      font-size:9px;font-weight:700;
+      color:var(--orange);
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .empty{padding:60px 20px;text-align:center;color:var(--text-3);font-size:14px;line-height:1.6}
+    .load-more{padding:16px;text-align:center;color:var(--text-3);font-size:12px;cursor:pointer;transition:color .15s}
+    .load-more:active{color:var(--accent)}
+    .list-end{height:calc(env(safe-area-inset-bottom,0px) + 20px)}
+
+    /* ─── MAP ─── */
+    #map-pane{position:absolute;inset:0;visibility:hidden;pointer-events:none;z-index:1}
+    #map-pane.on{visibility:visible;pointer-events:auto}
+    #gmap{width:100%;height:100%}
+
+    .map-legend{
+      position:absolute;top:12px;left:12px;z-index:10;
+      background:rgba(12,12,16,0.88);
+      backdrop-filter:blur(16px);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px 12px;
+    }
+    .ml-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+    .ml-row:last-child{margin-bottom:0}
+    .ml-dot{width:9px;height:9px;border-radius:50%}
+    .ml-row span{font-size:11px;color:var(--text-2)}
+
+    #map-loading{position:absolute;inset:0;background:rgba(12,12,16,0.75);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:5;gap:12px}
+    #map-loading.gone{display:none}
+    .ml-txt{font-size:13px;color:var(--text-2)}
+
+    /* ─── BOTTOM SHEET ─── */
+    #sheet{
+      position:absolute;bottom:0;left:0;right:0;
+      background:rgba(15,15,22,0.97);
+      backdrop-filter:blur(32px);
+      -webkit-backdrop-filter:blur(32px);
+      border-top:1px solid var(--border);
+      border-radius:22px 22px 0 0;
+      padding:10px 16px 16px;
+      padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px);
+      z-index:1000;
+      transform:translateY(100%);
+      transition:transform .3s cubic-bezier(.32,.72,0,1);
+    }
+    #sheet.up{transform:translateY(0)}
+    .sh-bar{width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 14px}
+    .sh-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px}
+    .sh-name{font-family:var(--font-display);font-size:17px;font-weight:700;flex:1;padding-right:10px;line-height:1.2;color:var(--text)}
+    .sh-x{
+      background:var(--surface-2);border:1px solid var(--border);border-radius:50%;
+      width:28px;height:28px;color:var(--text-2);font-size:12px;
+      display:flex;align-items:center;justify-content:center;cursor:pointer;
+      transition:background .15s;flex-shrink:0;
+    }
+    .sh-x:active{background:var(--surface-3)}
+    .sh-hood{font-size:11px;color:var(--text-3);margin-bottom:8px;letter-spacing:.02em}
+    .sh-hh{font-size:13px;color:var(--orange);font-weight:600;margin-bottom:5px}
+    .sh-deal{font-size:12px;color:var(--text-2);margin-bottom:14px;line-height:1.5}
+    .sh-cta{
+      width:100%;padding:13px;
+      background:var(--surface-2);
+      border:1px solid var(--border);
+      border-radius:12px;
+      color:var(--text);
+      font-size:14px;font-weight:600;
+      cursor:pointer;
+      transition:background .15s, border-color .15s;
+      letter-spacing:.01em;
+    }
+    .sh-cta:active{background:var(--surface-3)}
+
+    /* ─── DETAIL PAGE ─── */
+    #detail{
+      position:absolute;inset:0;z-index:200;
+      background:var(--bg);
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      transform:translateX(100%);
+      transition:transform .28s cubic-bezier(.32,.72,0,1);
+    }
+    #detail.open{transform:translateX(0)}
+
+    .d-nav{
+      position:sticky;top:0;z-index:5;
+      background:rgba(12,12,16,0.95);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border-subtle);
+      padding:10px 16px;
+      padding-top:calc(env(safe-area-inset-top,0px) + 8px);
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    .back{
+      background:none;border:none;
+      color:var(--accent);
+      font-size:14px;font-weight:600;
+      padding:4px 0;
+      display:flex;align-items:center;gap:5px;
+      cursor:pointer;letter-spacing:.01em;
+    }
+    .d-status{font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:5px}
+    .d-status.open{color:var(--green)}
+    .pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+
+    .d-body{padding:22px 16px 40px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 40px)}
+
+    /* Hero area */
+    .d-hero{margin-bottom:20px}
+    .d-name{
+      font-family:var(--font-display);
+      font-size:28px;font-weight:800;
+      color:var(--text);
+      margin-bottom:5px;
+      line-height:1.1;
+      letter-spacing:-.02em;
+    }
+    .d-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+    .d-addr{font-size:12px;color:var(--text-3);letter-spacing:.01em}
+    .d-rating{font-size:12px;color:var(--text-2)}
+    .d-note{font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:0;padding:12px 14px;background:var(--surface);border-radius:10px;border:1px solid var(--border-subtle)}
+
+    .d-sec{margin-bottom:24px}
+    .d-lbl{
+      font-size:9px;font-weight:700;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:var(--text-3);margin-bottom:10px;
+      display:flex;align-items:center;gap:8px;
+    }
+    .d-lbl::after{content:'';flex:1;height:1px;background:var(--border-subtle)}
+    .d-div{border:none;border-top:1px solid var(--border-subtle);margin:0 0 20px}
+
+    /* HH section */
+    .d-hh-box{
+      background:var(--surface);
+      border:1px solid var(--border-subtle);
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:12px;
+    }
+    .d-hh-time{font-size:15px;font-weight:700;color:var(--orange);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .d-days{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+    .d-day{
+      padding:4px 9px;border-radius:6px;
+      font-size:10px;font-weight:600;
+      background:var(--surface-2);color:var(--text-3);
+      border:1px solid var(--border-subtle);
+      letter-spacing:.02em;
+    }
+    .d-day.on{background:rgba(232,100,58,0.12);color:var(--orange);border-color:rgba(232,100,58,0.3)}
+
+    .d-deals{display:flex;flex-direction:column;gap:8px}
+    .d-deal{
+      display:flex;align-items:flex-start;gap:10px;
+      padding:10px 12px;
+      background:var(--surface-2);
+      border:1px solid var(--border-subtle);
+      border-radius:10px;
+    }
+    .d-deal::before{content:'✦';font-size:8px;color:var(--accent);flex-shrink:0;margin-top:3px}
+    .d-deal-t{font-size:13px;color:var(--text);line-height:1.45}
+
+    .no-hh{padding:16px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:12px;font-size:13px;color:var(--text-2);text-align:center}
+    .d-ph{font-size:13px;color:var(--text-2)}
+
+    .d-hours-list{display:flex;flex-direction:column;gap:6px}
+    .d-hour-row{display:flex;justify-content:space-between;font-size:12px;padding:6px 12px;border-radius:7px}
+    .d-hour-row:nth-child(odd){background:var(--surface)}
+    .d-hour-day{color:var(--text-2)}
+    .d-hour-time{color:var(--text-2)}
+    .d-hour-row.today{background:var(--green-dim);border:1px solid var(--green-border)}
+    .d-hour-row.today .d-hour-day{color:var(--green);font-weight:600}
+    .d-hour-row.today .d-hour-time{color:var(--green);font-weight:600}
+
+    /* ─── MENU ─── */
+    .menu-btn{
+      width:100%;padding:14px 16px;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:12px;
+      color:var(--text);
+      font-size:14px;font-weight:500;
+      display:flex;justify-content:space-between;align-items:center;
+      cursor:pointer;
+      transition:background .15s, border-color .15s;
+    }
+    .menu-btn:active{background:var(--surface-2)}
+
+    .mtabs{display:flex;border-bottom:1px solid var(--border-subtle);margin-bottom:16px;gap:0}
+    .mtab{
+      flex:1;padding:10px 4px;
+      background:none;border:none;
+      border-bottom:2px solid transparent;
+      color:var(--text-3);
+      font-size:12.5px;font-weight:500;
+      cursor:pointer;margin-bottom:-1px;
+      transition:all .15s;letter-spacing:.01em;
+      font-family:var(--font-ui);
+    }
+    .mtab.on{border-bottom-color:var(--accent);color:var(--text);font-weight:700}
+
+    .mcat{margin-bottom:22px}
+    .mcat-name{
+      font-size:9px;font-weight:700;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:var(--accent);
+      margin-bottom:10px;
+      padding-bottom:7px;
+      border-bottom:1px solid var(--accent-border);
+    }
+    .mitem{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:11px}
+    .mitem-l{flex:1;min-width:0}
+    .mitem-n{font-size:13.5px;color:var(--text);display:block;font-weight:500;margin-bottom:2px}
+    .mitem-d{font-size:11px;color:var(--text-3);display:block;line-height:1.4}
+    .mitem-p{
+      font-size:12px;font-weight:700;
+      color:var(--accent);
+      font-family:'SF Mono','Courier New',monospace;
+      flex-shrink:0;
+      background:var(--accent-dim);
+      padding:2px 7px;border-radius:5px;
+    }
+
+    .maps-row{display:flex;gap:8px}
+    .maps-btn{
+      flex:1;padding:12px;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:12px;
+      color:var(--text-2);
+      font-size:12px;font-weight:500;
+      display:flex;align-items:center;justify-content:center;gap:6px;
+      text-decoration:none;
+      transition:border-color .15s, background .15s;
+    }
+    .maps-btn:active{background:var(--surface-2)}
+
+    /* ─── SCRAPER PANEL ─── */
+    #scraper-panel{
+      position:absolute;inset:0;z-index:300;
+      background:var(--bg);
+      overflow-y:auto;-webkit-overflow-scrolling:touch;
+      transform:translateX(100%);
+      transition:transform .28s cubic-bezier(.32,.72,0,1);
+    }
+    #scraper-panel.open{transform:translateX(0)}
+    .scr-nav{
+      position:sticky;top:0;background:rgba(12,12,16,0.95);
+      backdrop-filter:blur(20px);border-bottom:1px solid var(--border-subtle);
+      padding:10px 16px;
+      padding-top:calc(env(safe-area-inset-top,0px) + 8px);
+      display:flex;justify-content:space-between;align-items:center;z-index:5;
+    }
+    .scr-title{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text)}
+    .scr-body{padding:22px 16px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 40px)}
+    .scr-desc{font-size:12.5px;color:var(--text-2);line-height:1.7;margin-bottom:22px;padding:12px 14px;background:var(--surface);border-radius:10px;border:1px solid var(--border-subtle)}
+    .scr-label{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3);margin-bottom:7px}
+    .scr-input{
+      width:100%;padding:12px 14px;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:11px;color:var(--text);font-size:14px;
+      font-family:var(--font-ui);margin-bottom:12px;
+      transition:border-color .15s;
+    }
+    .scr-input:focus{border-color:var(--accent)}
+    .scr-input::placeholder{color:var(--text-3)}
+    .scr-btn{
+      width:100%;padding:14px;
+      background:var(--accent);border:none;border-radius:12px;
+      color:#0c0c10;font-size:15px;font-weight:700;
+      cursor:pointer;margin-bottom:18px;
+      transition:opacity .15s;
+      font-family:var(--font-ui);
+      letter-spacing:.01em;
+    }
+    .scr-btn:active{opacity:.85}
+
+    /* ─── UTILS ─── */
+    .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+    .menu-spin{display:flex;justify-content:center;padding:28px 0}
+
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<!-- No key screen - key is embedded -->
+
+<div id="app">
+  <div id="header">
+    <div class="hrow1">
+      <div>
+        <div class="logo"><span class="logo-icon">🍹</span> Happy Hour NYC</div>
+        <div class="subtitle" id="subtitle">Loading venues…</div>
+        <div id="menus-updated" style="display:none;font-size:11px;color:var(--text-3);margin-top:4px;"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="add-btn" onclick="openScraper()">+ Add Bar</button>
+        <div class="seg">
+        <button class="seg-btn" id="btn-list" onclick="setView('list')">List</button>
+        <button class="seg-btn on" id="btn-map" onclick="setView('map')">Map</button>
+      </div>
+      </div>
+    </div>
+    <input id="q" type="search" placeholder="Search bars, deals, neighborhoods…" oninput="applyFilters()" autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="frow">
+      <div class="pill on" id="pill-now" onclick="toggleNow()">Open now</div>
+      <div class="pill hh-only" id="pill-hh" onclick="toggleHHOnly()">HH only</div>
+      <div class="pill" id="pill-0" onclick="toggleDay(0)">Sun</div>
+      <div class="pill" id="pill-1" onclick="toggleDay(1)">Mon</div>
+      <div class="pill" id="pill-2" onclick="toggleDay(2)">Tue</div>
+      <div class="pill" id="pill-3" onclick="toggleDay(3)">Wed</div>
+      <div class="pill" id="pill-4" onclick="toggleDay(4)">Thu</div>
+      <div class="pill" id="pill-5" onclick="toggleDay(5)">Fri</div>
+      <div class="pill" id="pill-6" onclick="toggleDay(6)">Sat</div>
+      <div class="time-pill" id="time-pill" onclick="focusTime()">
+        <span class="tpl" id="tpl">At time</span>
+        <input type="time" id="time-input" oninput="onTimeChange()" onchange="onTimeChange()">
+      </div>
+      <div class="hood-pill" id="hood-pill">
+        <select id="hood-sel" onchange="onHoodChange()">
+          <option value="">📍 Area</option>
+        </select>
+        <span id="hood-lbl">📍 Area</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="content">
+    <div id="list-pane" class="gone">
+      <div id="list-inner"></div>
+      <div class="load-more" id="load-more" onclick="loadMorePlaces()" style="display:none">Load more venues…</div>
+      <div class="list-end"></div>
+    </div>
+
+    <div id="map-pane" class="on">
+      <div id="gmap"></div>
+      <div id="map-loading">
+        <div class="spinner"></div>
+        <div class="ml-txt" id="map-loading-txt">Searching Manhattan…</div>
+      </div>
+      <div class="map-legend">
+        <div class="ml-row"><div class="ml-dot" style="background:#4ade80"></div><span style="font-size:11px;color:#555">HH open now</span></div>
+        <div class="ml-row"><div class="ml-dot" style="background:#fb923c"></div><span style="font-size:11px;color:#555">Has HH data</span></div>
+      </div>
+      <div id="sheet">
+        <div class="sh-bar"></div>
+        <div class="sh-top">
+          <span class="sh-name" id="sh-name"></span>
+          <button class="sh-x" onclick="closeSheet()">✕</button>
+        </div>
+        <div class="sh-hood" id="sh-hood"></div>
+        <div class="sh-hh" id="sh-hh"></div>
+        <div class="sh-deal" id="sh-deal"></div>
+        <button class="sh-cta" onclick="openDetailFromSheet()">See full details →</button>
+      </div>
+    </div>
+
+    <div id="detail">
+      <div class="d-nav">
+        <button class="back" onclick="closeDetail()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <div class="d-status" id="d-status"></div>
+      </div>
+      <div class="d-body" id="d-body"></div>
+    </div><!-- end detail -->
+  </div><!-- end content -->
+
+  <!-- SCRAPER ADMIN PANEL -->
+  <div id="scraper-panel" style="position:absolute;inset:0;z-index:300;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateX(100%);transition:transform .28s cubic-bezier(.32,.72,0,1)">
+    <div class="scr-nav">
+      <button onclick="closeScraper()" style="background:none;border:none;color:var(--accent);font-size:14px;font-weight:600;display:flex;align-items:center;gap:5px;cursor:pointer;font-family:var(--font-ui)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back
+      </button>
+      <span class="scr-title">✦ AI Bar Scraper</span>
+      <div style="width:60px"></div>
+    </div>
+    <div class="scr-body">
+      <div class="scr-desc">Enter any bar name and Claude will search the web, find their real happy hour schedule and deals, and add them to the app.</div>
+      <div class="scr-label">Bar Name</div>
+      <input id="sc-name" type="text" placeholder="e.g. The Dead Rabbit" class="scr-input">
+      <div class="scr-label">Website (optional)</div>
+      <input id="sc-url" type="url" placeholder="https://theirwebsite.com" class="scr-input">
+      <button id="sc-btn" onclick="scrapeBar()" class="scr-btn">Search & Extract →</button>
+      <div id="sc-result"></div>
+    </div>
+  </div>
+
+</div><!-- end app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CURATED HAPPY HOUR DATA (106 bars)
+// ═══════════════════════════════════════════════════════════
+const DAYS_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const HH_DATA = {
+"dollys":{name:"Dolly's",lat:40.7624,lng:-73.9853,hood:"Hell's Kitchen",addr:"302 W 51st St",website:"https://www.dollys51.com",days:[1,2,3,4,5,6,0],sH:15,eH:24,label:"Daily (Yappy Hour all day)",deals:["$15 She Loves Me Not (vodka, strawberry cream, lemon)","$18 Whiskey Me Off My Feet (Tin Cup, Skrewball, luxardo)","$30 Martini Service for Two + truffle fries","$21 Dolly Made Nachos"],note:"Southern comfort bar in Hell's Kitchen. They call it 'Yappy Hour'. Known for boot mugs, deviled eggs, bottomless brunch"},
+"sir-henrys":{name:"Sir Henry's",lat:40.7621,lng:-73.9991,hood:"Hell's Kitchen",addr:"557 9th Ave",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$8 craft cocktails","$6 beers","$8 wines","$5 shots"],note:"4.8★ rock bar, live music nightly"},
+"the-dickens":{name:"The Dickens",lat:40.7613,lng:-73.9990,hood:"Hell's Kitchen",addr:"587 9th Ave",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["FREE bottomless fries w/ martini","$12 martinis","$6 beers","$8 wines"],note:"4 floors + rooftop. FREE bottomless fries with every martini"},
+"haswell-greens":{name:"Haswell Green's",lat:40.7622,lng:-74.0045,hood:"Hell's Kitchen",addr:"600 11th Ave",days:[1,2,3,4,5],sH:16,eH:20,label:"Mon–Fri 4–8PM",deals:["$6 draft beers","$8 cocktails","$8 wines","$5 shots"],note:"Massive bar with stunning Hudson Yards views"},
+"marseille":{name:"Marseille",lat:40.7600,lng:-73.9998,hood:"Hell's Kitchen",addr:"630 9th Ave",days:[1,2,3,4,5,6,0],sH:16,eH:18,label:"Daily 4–6PM",deals:["$1.50 oysters","$8 cocktails","$7 wines","$6 beers"],note:"$1.50 oysters daily 4–6PM. Perfect pre-theater stop"},
+"russian-vodka-room":{name:"Russian Vodka Room",lat:40.7632,lng:-73.9872,hood:"Hell's Kitchen",addr:"265 W 52nd St",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$4 vodka shots","$5 cosmos","$8 infused vodka flights"],note:"House-infused vodkas in dozens of flavors"},
+"friki-tiki":{name:"The Friki Tiki",lat:40.7557,lng:-73.9970,hood:"Hell's Kitchen",addr:"459 9th Ave",days:[1,2,3,4,5],sH:15,eH:19,label:"Mon–Fri 3–7PM",deals:["$10 tiki cocktails","$6 beers","$8 wines"],note:"Best tiki bar in Manhattan"},
+"ardesia":{name:"Ardesia Wine Bar",lat:40.7633,lng:-73.9913,hood:"Hell's Kitchen",addr:"510 W 52nd St",days:[2,3,4,5],sH:17,eH:19,label:"Tue–Fri 5–7PM",deals:["$8 wines by glass","$12 cocktails","$6 beers"],note:"Sleek marble bar — best wine selection in Hell's Kitchen"},
+"mercury-bar":{name:"Mercury Bar",lat:40.7568,lng:-73.9971,hood:"Hell's Kitchen",addr:"493 9th Ave",days:[1,2,3,4,5],sH:11,eH:20,label:"Mon–Fri 11AM–8PM",deals:["$6 beers","$7 well drinks","$5 Taco Tuesdays"],note:"9-hour happy hour. $5 Taco Tuesdays"},
+"waylon":{name:"The Waylon",lat:40.7611,lng:-74.0023,hood:"Hell's Kitchen",addr:"736 10th Ave",days:[1,2,3,4,5,6,0],sH:15,eH:19,label:"Daily 3–7PM",deals:["$6 beers","$8 whiskeys","$7 wines"],note:"Hell's Kitchen honky tonk — live country + back patio"},
+"rudys":{name:"Rudy's Bar & Grill",lat:40.7602,lng:-74.0004,hood:"Hell's Kitchen",addr:"627 9th Ave",days:[1,2,3,4,5,6,0],sH:12,eH:24,label:"Daily from noon",deals:["$3–4 beers","$12 pitchers","FREE hot dog w/ every drink"],note:"NYC institution: $3 beers + FREE hot dog with every drink"},
+"dynamo-room":{name:"The Dynamo Room",lat:40.7519,lng:-74.0006,hood:"Midtown",addr:"600 W 34th St",days:[1,2,3,4,5],sH:15,eH:18,label:"Mon–Fri 3–6PM",deals:["$13.95 cocktails","$12.95 wine","$5.95 beer","$29.95 NYC Happy Meal"],note:"$29.95 NYC Happy Meal: dirty martini + caesar + beef fat fries"},
+"golden-hof":{name:"Golden HOF",lat:40.7599,lng:-73.9748,hood:"Midtown",addr:"16 W 48th St",days:[1,2,3,4,5],sH:15,eH:18,label:"Daily 3–6PM",deals:["$10 cocktails","$14 wine","$6 beer","$6 makgeolli"],note:"Korean-American near 30 Rock — perilla daiquiri is a must"},
+"la-cava":{name:"La Cava",lat:40.7587,lng:-73.9797,hood:"Midtown",addr:"45 Rockefeller Plaza",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$8 wines","$10 cocktails","$7 beers"],note:"Underground wine cave beneath 30 Rock"},
+"rum-house":{name:"The Rum House",lat:40.7593,lng:-73.9851,hood:"Midtown",addr:"228 W 47th St",days:[1,2,3,4,5,6,0],sH:15,eH:18,label:"Daily 3–6PM",deals:["$12 rum cocktails","$8 beers","$10 wines"],note:"Best bar near Times Square — piano bar with live music"},
+"shakespeare":{name:"The Shakespeare",lat:40.7506,lng:-73.9880,hood:"Midtown",addr:"5 W 36th St",days:[1,2,3,4,5],sH:12,eH:19,label:"Mon–Fri 12–7PM",deals:["$6 draft beers","$8 cocktails","$7 wines"],note:"7-hour HH. Best British pub in Midtown"},
+"valerie":{name:"Valerie",lat:40.7536,lng:-73.9877,hood:"Midtown",addr:"112 W 38th St",days:[1,2,3,4,5],sH:15,eH:19,label:"Mon–Fri 3–7PM",deals:["$1 oysters (w/ drink)","$10 cocktails","$7 beers","$9 wines"],note:"$1 oysters with any drink — incredible Midtown deal"},
+"rpm-underground":{name:"RPM Underground",lat:40.7566,lng:-73.9808,hood:"Midtown",addr:"40 W 45th St",days:[1,2,3,4,5],sH:13,eH:19,label:"Mon–Fri 1–7PM",deals:["50% off ALL food & drinks","17 karaoke rooms"],note:"50% off everything 1–7PM + 17 private karaoke rooms"},
+"castell-rooftop":{name:"Castell Rooftop",lat:40.7557,lng:-73.9826,hood:"Midtown",addr:"15 W 44th St",days:[2,3,4,5],sH:16,eH:19,label:"Tue–Fri 4–7PM",deals:["$9 tiny martinis Tue","$12 cocktails","$10 wines","$6 beers"],note:"Hotel rooftop — $9 tiny martinis on Tuesdays"},
+"havana-central":{name:"Havana Central",lat:40.7578,lng:-73.9863,hood:"Midtown",addr:"151 W 46th St",days:[1,2,3,4,5],sH:15,eH:19,label:"Mon–Fri 3–7PM",deals:["$8 mojitos","$8 margaritas","$6 beers"],note:"Best pre-theater pregame near Times Square"},
+"peter-dillons":{name:"Peter Dillon's",lat:40.7515,lng:-73.9720,hood:"Midtown",addr:"221 E 45th St",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$5 drafts","$7 well drinks","$7 wines"],note:"Best Irish pub near Grand Central"},
+"vue-180":{name:"Vue 180 Rooftop",lat:40.7527,lng:-73.9930,hood:"Midtown",addr:"525 8th Ave",days:[1,2,3,4,5],sH:19,eH:24,label:"Mon–Fri 7PM–close",deals:["$9 beers","$9 wines","$10 cocktails"],note:"Reversed HH 7PM–close — stunning rooftop views"},
+"musaek":{name:"Musaek",lat:40.7484,lng:-73.9880,hood:"Koreatown",addr:"15 W 32nd St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$10 cocktails","$6 makgeolli","$8 soju cocktails"],note:"Speakeasy aesthetic with Korean cocktails"},
+"tap-haus":{name:"Tap Haus 33",lat:40.7482,lng:-73.9877,hood:"Koreatown",addr:"33 W 33rd St",days:[1,2,3,4],sH:17,eH:20,label:"Mon–Thu 5–8PM",deals:["$25 all-you-can-drink draft","$10 cocktails"],note:"$25 AYCE draft beer Mon–Thu"},
+"old-town-bar":{name:"Old Town Bar",lat:40.7392,lng:-73.9893,hood:"Flatiron",addr:"45 E 18th St",days:[1,2,3,4,5],sH:15,eH:18,label:"Mon–Fri 3–6PM",deals:["$5 domestic beers","$7 wines","$6 well drinks"],note:"Open since 1892 — original mahogany bar and tin ceilings"},
+"caliza":{name:"Caliza",lat:40.7411,lng:-73.9852,hood:"Flatiron",addr:"149 E 23rd St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$13 margaritas","$13 sangria","$8 cervezas"],note:"Beautiful patio — resort vibes in Flatiron"},
+"turnmill":{name:"Turnmill",lat:40.7450,lng:-73.9878,hood:"NoMad",addr:"220 5th Ave",days:[1,2,3,4,5],sH:12,eH:19,label:"Mon–Fri 12–7PM",deals:["$8 well drinks","$6 beers","$9 wines","$10 cocktails"],note:"7-hour happy hour noon to 7PM every weekday"},
+"a10-kitchen":{name:"A10 Kitchen",lat:40.7387,lng:-73.9858,hood:"Union Square",addr:"247 Park Ave S",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$20 pitchers","$5 margaritas","$5 truffle mac & cheese"],note:"$5 truffle mac & cheese is the move"},
+"la-nacional":{name:"La Nacional",lat:40.7396,lng:-74.0009,hood:"Chelsea",addr:"239 W 14th St",days:[2,3,4,5],sH:16,eH:18,label:"Tue–Fri 4–6PM",deals:["$5 draft beers","$6 sangria & wine","$7 tapas"],note:"Infatuation #1 — oldest Spanish club in NYC (1868)"},
+"magic-hour":{name:"Magic Hour Rooftop",lat:40.7484,lng:-73.9967,hood:"Chelsea",addr:"485 7th Ave",days:[1,2,3,4,5],sH:15,eH:18,label:"Mon–Fri 3–6:30PM",deals:["$4 fries","$6 beers","$8 wines","$10 drinks"],note:"18th floor Moxy Hotel — mini golf + rooftop views"},
+"half-king":{name:"The Half King",lat:40.7476,lng:-74.0052,hood:"Chelsea",addr:"505 W 23rd St",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$6 draft beers","$8 wines","$9 cocktails"],note:"Famous literary bar — journalists & writers since 2000"},
+"porchlight":{name:"Porchlight",lat:40.7487,lng:-74.0072,hood:"Chelsea",addr:"271 11th Ave",days:[1,2,3,4,5],sH:16,eH:18,label:"Mon–Fri 4–6PM",deals:["$9 whiskey cocktails","$6 beers","$8 wines"],note:"Best Southern whiskey bar in NYC"},
+"dante-wv":{name:"Dante West Village",lat:40.7337,lng:-74.0068,hood:"West Village",addr:"551 Hudson St",days:[1,2,3,4,5,6,0],sH:15,eH:18,label:"Daily 3–6PM",deals:["$10 Negronis","$10 Aperol Spritz","$8 wines"],note:"World's Best Bar 2019 — sister to the original"},
+"stonewall-inn":{name:"Stonewall Inn",lat:40.7335,lng:-74.0025,hood:"West Village",addr:"53 Christopher St",days:[1,2,3,4,5,6,0],sH:14,eH:20,label:"Daily 2–8PM",deals:["$7 cocktails","$5 beers","$6 wines","$4 wells"],note:"National Historic Landmark — birthplace of LGBTQ+ rights"},
+"duplex":{name:"The Duplex",lat:40.7341,lng:-74.0028,hood:"West Village",addr:"61 Christopher St",days:[1,2,3,4,5,6,0],sH:15,eH:20,label:"Daily 3–8PM",deals:["$8 wines","$6 beers","$9 cocktails"],note:"Piano bar/cabaret — patio + nightly shows at 9PM"},
+"bandits-diner":{name:"Bandits Diner",lat:40.7337,lng:-74.0027,hood:"West Village",addr:"142 W 10th St",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$10 martinis","$15 martini + tots","$8 wine","$6 beer"],note:"$15 Happy Meal = martini + tots is the definitive order"},
+"dante-gv":{name:"Dante",lat:40.7300,lng:-74.0002,hood:"Greenwich Village",addr:"79 MacDougal St",days:[1,2,3,4,5,6,0],sH:15,eH:18,label:"Daily 3–6PM",deals:["$10 Negronis","$10 Aperol Spritz","$8 wines","$12 cocktails"],note:"The original World's Best Bar 2019"},
+"amelie-gv":{name:"Amelie Wine Bar",lat:40.7307,lng:-73.9987,hood:"Greenwich Village",addr:"22 W 8th St",days:[1,2,3,4,5,6,0],sH:16,eH:18,label:"Daily 4–6PM",deals:["$10 cocktails","$7 beers","$14 wine flights"],note:"$14 wine flights. $21 early bird = meal + wine"},
+"the-jane":{name:"The Jane Ballroom",lat:40.7371,lng:-74.0074,hood:"Greenwich Village",addr:"113 Jane St",days:[1,2,3,4,5,6,0],sH:16,eH:20,label:"Daily 4–8PM",deals:["$7 wines","$4 draft beers","$9 draft Negroni"],note:"Hotel bar in stunning 1908 building"},
+"miss-lilys":{name:"Miss Lily's 7A",lat:40.7262,lng:-73.9826,hood:"East Village",addr:"109 Ave A",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$8 cocktails","$6 beer","$7 wine"],note:"Lily's Rum Punch. Tuesday jerk crab boil is legendary"},
+"bar-belly":{name:"Bar Belly",lat:40.7257,lng:-73.9793,hood:"East Village",addr:"171 Ave B",days:[1,2,3,4,5,6,0],sH:17,eH:19,label:"Daily 5–7PM",deals:["$2 oysters","$14 cocktails","Free popcorn","$8 wines"],note:"Free popcorn on arrival. $2 oysters every day"},
+"wcou":{name:"WCOU Tile Bar",lat:40.7272,lng:-73.9847,hood:"East Village",addr:"115 1st Ave",days:[1,2,3,4,5,6,0],sH:12,eH:20,label:"Daily until 8PM",deals:["$4 well drinks","$5 beers"],note:"Classic EV dive — $4 well drinks until 8PM"},
+"bibi":{name:"Bibi Wine Bar",lat:40.7270,lng:-73.9895,hood:"East Village",addr:"30 E 7th St",days:[1,2,3,4,5,6,0],sH:17,eH:20,label:"Daily 5–8PM",deals:["$5 glass house wine","$28 select bottles","$6 beers"],note:"Australian wine bar — $28 bottle deal during HH"},
+"the-wayland":{name:"The Wayland",lat:40.7239,lng:-73.9762,hood:"East Village",addr:"700 E 9th St",days:[1,2,3,4,5,6,0],sH:16,eH:19,label:"Daily 4–7PM",deals:["$10 cocktails","$10 half-dozen oysters","$15 beer+burger"],note:"$10 half-dozen oysters — best deal in Alphabet City"},
+"mermaid-inn":{name:"Mermaid Inn EV",lat:40.7264,lng:-73.9867,hood:"East Village",addr:"96 2nd Ave",days:[1,2,3,4,5,6,0],sH:17,eH:19,label:"Tue–Fri 5–7, Sat–Sun 4–7PM",deals:["$6 beer","$8.50 wine","Mini lobster roll"],note:"Mini lobster roll + $6 beer. Best backyard in EV"},
+"la-linea":{name:"La Linea",lat:40.7271,lng:-73.9847,hood:"East Village",addr:"15 1st Ave",days:[0,1,2,3,4,6],sH:12,eH:21,label:"Daily until 9PM",deals:["$3 off all drinks","$8 beers","$11 cocktails"],note:"HH until 9PM. Taco Tuesdays $4 tacos"},
+"rosella":{name:"Rosella",lat:40.7260,lng:-73.9824,hood:"East Village",addr:"137 Ave A",days:[1,2,3,4,5,6,0],sH:17,eH:18,label:"Daily 5–6:30PM",deals:["$6 beer","$12 wine","5-pc nigiri $25"],note:"Infatuation 8.8 — American sushi with local NY ingredients"},
+"verlaine":{name:"Verlaine",lat:40.7196,lng:-73.9862,hood:"Lower East Side",addr:"110 Rivington St",days:[1,2,3,4,5,6,0],sH:17,eH:22,label:"Daily 5–10PM",deals:["$8 lychee martinis","$6 beers","$9 wines"],note:"Longest HH in Manhattan — every night until 10PM"},
+"cervos":{name:"Cervo's",lat:40.7149,lng:-73.9986,hood:"Lower East Side",addr:"43 Canal St",days:[2,3,4,5],sH:17,eH:18,label:"Tue–Fri 5–6PM",deals:["$1 oysters","$7 beers","$10 wines","$12 cocktails"],note:"James Beard nominated. $1 oysters during HH"},
+"barrio-chino":{name:"Barrio Chino",lat:40.7165,lng:-73.9938,hood:"Lower East Side",addr:"253 Broome St",days:[1,2,3,4,5,6,0],sH:16,eH:20,label:"Daily 4–8PM",deals:["$8 margaritas","$7 beers","$9 mezcal cocktails"],note:"4-hour daily happy hour"},
+"la-caverna":{name:"La Caverna",lat:40.7195,lng:-73.9882,hood:"Lower East Side",addr:"122 Rivington St",days:[3,5,0],sH:17,eH:20,label:"Wed/Fri/Sun",deals:["$3 tacos","$6 beers","$8 margaritas"],note:"Huge underground cave bar — $3 Taco Tuesdays"},
+"mr-purple":{name:"Mr. Purple Rooftop",lat:40.7218,lng:-73.9882,hood:"Lower East Side",addr:"180 Orchard St",days:[1,2,3],sH:16,eH:19,label:"Mon–Wed 4–7PM",deals:["$6 bar snacks","$11 cocktails","$11 wines"],note:"15th floor — stunning LES rooftop views"},
+"local-138":{name:"Local 138",lat:40.7185,lng:-73.9879,hood:"Lower East Side",addr:"138 Ludlow St",days:[1,2,3,4,5,6,0],sH:16,eH:20,label:"Daily 4–8PM",deals:["$5 domestic beers","$7 wines","$7 wells"],note:"Classic LES neighborhood dive"},
+"bonnie-vee":{name:"Bonnie Vee",lat:40.7181,lng:-73.9879,hood:"Lower East Side",addr:"17 Stanton St",days:[1,2,3,4,5,6,0],sH:16,eH:19,label:"Daily 4–7PM",deals:["$12 daily cocktail","$5 Tecate","$2 off wines"],note:"Back patio. Daily cocktail deals + warm pretzel"},
+"spring-lounge":{name:"Spring Lounge",lat:40.7225,lng:-73.9963,hood:"Nolita",addr:"48 Spring St",days:[1,2,3,4,5,6,0],sH:12,eH:20,label:"Daily 12–8PM",deals:["$4 domestic beers","$6 wines","$5 wells"],note:"Classic Nolita dive — 8-hour daily HH"},
+"roxy-bar":{name:"Roxy Bar",lat:40.7240,lng:-74.0064,hood:"SoHo",addr:"2 6th Ave",days:[1,2,3,4,5],sH:16,eH:18,label:"Mon–Fri 4–6PM",deals:["$2 oysters","$5 beers","$9 wines","$10 cocktails"],note:"$2 oysters Mon–Fri 4–6PM"},
+"port-said":{name:"Port Sa'id",lat:40.7209,lng:-73.9881,hood:"SoHo",addr:"178 Stanton St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["BOGO cocktails","Snack specials"],note:"BOGO cocktails — one of the best HH deals in Manhattan"},
+"botanica":{name:"Botanica Bar",lat:40.7252,lng:-73.9966,hood:"SoHo",addr:"47 E Houston St",days:[1,2,3,4,5,6,0],sH:12,eH:20,label:"Daily until 8PM",deals:["$3–5 drafts","$5 wine","$4 wells"],note:"Daily HH until 8PM every night"},
+"tinys":{name:"Tiny's",lat:40.7174,lng:-74.0094,hood:"Tribeca",addr:"135 W Broadway",days:[1,2,3,4,5,6,0],sH:16,eH:18,label:"Daily 4–6PM",deals:["$11 house wine","$13 sangria","$22 martini+tots","$2 oysters"],note:"Flamingo-pink Tribeca townhouse"},
+"the-odeon":{name:"The Odeon",lat:40.7168,lng:-74.0086,hood:"Tribeca",addr:"145 W Broadway",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$9 cocktails","$8 wines","$6 beers"],note:"Tribeca institution since 1980 — Andy Warhol's haunt"},
+"169-bar":{name:"169 Bar",lat:40.7141,lng:-73.9892,hood:"Chinatown",addr:"169 E Broadway",days:[1,2,3,4,5,6,0],sH:11,eH:19,label:"Daily 11:30AM–7:30PM",deals:["$1 off all beers","$4 Taco Tuesdays"],note:"100+ years old — $1 off beers all day"},
+"dead-rabbit":{name:"The Dead Rabbit",lat:40.7033,lng:-74.0121,hood:"Financial District",addr:"30 Water St",days:[1,2,3,4,5],sH:11,eH:20,label:"Mon–Fri 11AM–8PM",deals:["$5 pints in Taproom","$10 cocktails","$12 Irish whiskeys"],note:"World's Best Bar. $5 pints in the Taproom"},
+"pier-a":{name:"Pier A Harbor House",lat:40.7034,lng:-74.0168,hood:"Financial District",addr:"22 Battery Pl",days:[1,2,3,4,5],sH:15,eH:19,label:"Mon–Fri 3–7PM",deals:["$4 beers","$6 wines","$8 drinks","$1.50 oysters"],note:"Harbor views from historic Battery Park pier"},
+"fraunces-tavern":{name:"Fraunces Tavern",lat:40.7034,lng:-74.0098,hood:"Financial District",addr:"54 Pearl St",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$7 draft beers","$9 wines","$10 cocktails"],note:"Oldest bar in NYC (1762) — Washington's farewell address"},
+"merchants-river":{name:"Merchants River House",lat:40.7077,lng:-74.0161,hood:"Financial District",addr:"375 South End Ave",days:[1,2,3,4,5,6,0],sH:15,eH:19,label:"Daily 3–7PM",deals:["$8 cocktails","$6 beers","$8 wines"],note:"Hudson River + Statue of Liberty views"},
+"tao-downtown":{name:"TAO Downtown",lat:40.7426,lng:-74.0047,hood:"Meatpacking",addr:"92 9th Ave",days:[1,2,3,4,5],sH:17,eH:20,label:"Mon–Fri 5–8PM",deals:["$8 beers","$9 cocktails","$9 wines","$7 bites"],note:"Rare HH at a celeb hotspot"},
+"mollys-shebeen":{name:"Molly's Shebeen",lat:40.7412,lng:-73.9847,hood:"Gramercy",addr:"287 3rd Ave",days:[1,2,3,4,5,6,0],sH:16,eH:19,label:"Daily 4–7PM",deals:["$6 drafts","$8 cocktails","$7 wines"],note:"Legendary fireplace, sawdust floors, wood-paneled walls"},
+"seven-sins":{name:"Seven Sins",lat:40.7411,lng:-73.9844,hood:"Gramercy",addr:"293 3rd Ave",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$7 drafts","$7 wines","$12 cocktails"],note:"Official NY hub for Notre Dame games"},
+"cafe-dalsace":{name:"Cafe d'Alsace",lat:40.7784,lng:-73.9533,hood:"Upper East Side",addr:"1695 2nd Ave",days:[1,2,3,4,5,6,0],sH:17,eH:20,label:"Daily 5–8PM",deals:["$7 beers","$12 cocktails","$10 wine"],note:"Best beer list on the UES — Alsatian imports since the 80s"},
+"penrose":{name:"Penrose",lat:40.7763,lng:-73.9537,hood:"Upper East Side",addr:"1590 2nd Ave",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$7 drafts","$8 wines","$10 cocktails","$5 wells"],note:"Best craft beer list on the UES"},
+"stumble-inn":{name:"Stumble Inn",lat:40.7741,lng:-73.9547,hood:"Upper East Side",addr:"1454 2nd Ave",days:[1,2,3,4,5],sH:12,eH:20,label:"Mon–Fri 12–8PM",deals:["$5 domestic beers","$4 well drinks"],note:"8-hour HH — cheapest beers on the Upper East Side"},
+"nobody-told-me":{name:"Nobody Told Me",lat:40.8209,lng:-73.9576,hood:"Upper West Side",addr:"1586 Amsterdam Ave",days:[1,2,3,4,5,6,0],sH:15,eH:18,label:"Daily 3–6PM",deals:["Discounted Negroni","Discounted Aperol Spritz","Discounted espresso martini"],note:"Best cocktail bar on the Upper West Side"},
+"amelie-uws":{name:"Amelie UWS",lat:40.7899,lng:-73.9804,hood:"Upper West Side",addr:"2325 Broadway",days:[1,2,3,4,5,6,0],sH:16,eH:18,label:"Daily 4–6PM",deals:["$10 cocktails","$7 beers","$14 wine flights"],note:"UWS outpost of the popular GV wine bar"},
+"jakes-dilemma":{name:"Jake's Dilemma",lat:40.7836,lng:-73.9788,hood:"Upper West Side",addr:"430 Amsterdam Ave",days:[1,2,3,4,5,6,0],sH:16,eH:18,label:"Daily 4–6PM",deals:["Half-price well drinks","$4 beer buckets","$1.50 burgers"],note:"Half-price well drinks daily"},
+"red-rooster":{name:"Red Rooster",lat:40.8082,lng:-73.9427,hood:"Harlem",addr:"310 Lenox Ave",days:[1,2,3,4,5],sH:12,eH:22,label:"Mon–Fri 12–10PM",deals:["$10 signature cocktails","$20 snack combo"],note:"Marcus Samuelsson's Harlem classic — live jazz nightly"},
+"vinateria":{name:"Vinateria",lat:40.8100,lng:-73.9534,hood:"Harlem",addr:"2211 Frederick Douglass Blvd",days:[1,2,3,4,5,6],sH:16,eH:18,label:"Mon–Sat 4–6PM",deals:["$10 Bordeaux","$8 cocktails","Bacalao croquettes $12"],note:"Sidewalk tables — $10 Bordeaux + terrific bacalao croquettes"},
+"shrine":{name:"Shrine",lat:40.8156,lng:-73.9408,hood:"Harlem",addr:"2271 Adam Clayton Powell Jr Blvd",days:[1,2,3,4,5,6,0],sH:16,eH:20,label:"Daily 4–8PM",deals:["$5 beers","$7 cocktails","$6 wines"],note:"Live music every night — often FREE during happy hour"},
+"harlem-tavern":{name:"Harlem Tavern",lat:40.8105,lng:-73.9527,hood:"Harlem",addr:"2153 Frederick Douglass Blvd",days:[1,2,3,4,5,6,0],sH:12,eH:19,label:"Daily 12–7PM",deals:["$7 drinks","$6 craft beers","$5 drafts"],note:"Huge beer garden — best outdoor bar in Harlem"},
+"hamilton-hall":{name:"Hamilton Hall",lat:40.8245,lng:-73.9440,hood:"Hamilton Heights",addr:"3493 Broadway",days:[1,2,3,4,5],sH:15,eH:19,label:"Mon–Fri 3–7PM",deals:["$1 off draft beer","$8 house wine","$8 cocktails"],note:"Live jazz every Saturday"},
+"yatenga":{name:"Yatenga",lat:40.8160,lng:-73.9424,hood:"Harlem",addr:"2269 Frederick Douglass Blvd",days:[2,3,4,5],sH:17,eH:19,label:"Tue–Fri 5–7PM",deals:["French-Caribbean cocktails","$8 wines","$6 beers"],note:"French-Caribbean gem — one of Harlem's best date spots"},
+"inwood-bar":{name:"Inwood Bar & Grill",lat:40.8679,lng:-73.9236,hood:"Inwood",addr:"4957 Broadway",days:[1,2,3,4,5,6,0],sH:12,eH:19,label:"Daily until 7PM",deals:["$3 beers","$1 house shots","$15 beer buckets"],note:"Biggest sports bar in Inwood — $3 beers + $1 shots"},
+"the-heights":{name:"The Heights",lat:40.8050,lng:-73.9668,hood:"Washington Heights",addr:"2867 Broadway",days:[1,2,3,4,5,6,0],sH:15,eH:20,label:"Daily 3–8PM",deals:["$6 frozen margaritas","$7 cocktails","$5 beers"],note:"Two floors + rooftop, popular with Columbia students"},
+// ── ADDITIONAL HIGH-RATED VENUES ──
+"dante-gv":{name:"Dante",lat:40.7278,lng:-73.9994,hood:"Greenwich Village",addr:"79-81 MacDougal St",days:[1,2,3,4,5,6,0],sH:15,eH:17,label:"Daily 3–5PM (Martini Hour)",deals:["$10 martinis (Dante Martini, Dirty, With a Twist, 20th Century)","No food discounts — marinated olives $8, Marcona almonds $7"],note:"4.7★ World's #1 Best Bar 2019. Since 1915. Martini Hour not HH — $10 martinis daily 3-5PM. James Beard Foundation Award winner"},
+"dante-wv":{name:"Dante West Village",lat:40.7355,lng:-74.0049,hood:"West Village",addr:"551 Hudson St",days:[1,2,3,4,5,6,0],sH:15,eH:17,label:"Daily 3–5PM (Martini Hour)",deals:["$10 martinis","Wood-fired grill","\$10 martini flights"],note:"4.6★ Sister to the legendary Dante (GV). $10 Martini Hour 3-5PM daily. Wood-fired Italian food"},
+"sake-bar-decibel":{name:"Sake Bar Decibel",lat:40.7284,lng:-73.9856,hood:"East Village",addr:"240 E 9th St",days:[2,3,4,5,6],sH:18,eH:19,label:"Tue–Sat 6–7PM",deals:["$6 Sapporo draft","$8 cocktails (Lychee Martini, Sake Tini, Yuzu Sake, Umeshu Soda)","$38 cocktail pitcher"],note:"4.6★ NYC's original sake bar since 1993. Hidden underground behind 'On Air' sign. Tokyo Golden Gai vibes, walls covered in customer graffiti"},
+"dear-irving":{name:"Dear Irving",lat:40.7380,lng:-73.9865,hood:"Gramercy",addr:"55 Irving Place",days:[1,2,3,4,5,6,0],sH:17,eH:19,label:"From 5PM daily",deals:["Cocktails $17–20","Small plates available","First-come seating or reservations"],note:"4.7★ From the Raines Law Room team. Speakeasy with time-travel rooms: JFK lounge, Marie Antoinette, Victorian. World's 50 Best Discovery list"},
+"fleur-room":{name:"Fleur Room",lat:40.7448,lng:-73.9952,hood:"Midtown / Chelsea",addr:"105 W 28th St, Rooftop",days:[2,3,4,5],sH:17,eH:20,label:"Tue–Fri 5–8PM",deals:["$7 beers","$8 wines","$8 bar bites","$10 spritzes","$12 mixed drinks"],note:"4.5★ 360° rooftop views including Empire State Building. 21+ only, walk-ins welcome. Best skyline views in Midtown"},
+"bella-union":{name:"Bella Union Rooftop",lat:40.7589,lng:-73.9931,hood:"Midtown",addr:"220 W 41st St, Rooftop",days:[1,2,3,4,5],sH:16,eH:20,label:"Mon–Fri 4–8PM",deals:["Cocktails discounted","$10 espresso martinis (Sundays)","$10 pizzas (daily)","$10 wings 12pc","\$30/person unlimited cocktails + sampler (Mon & Wed 8PM–close)"],note:"4.5★ Midtown rooftop with great food HH deals. Prohibition Hour: unlimited cocktails + sampler platter $30/person Mon & Wed 8PM–close"},
+"fish-cheeks":{name:"Fish Cheeks",lat:40.7265,lng:-73.9954,hood:"NoHo",addr:"55 Bond St",days:[1,2,3,4,5],sH:16,eH:17,label:"Mon–Fri 4–5PM",deals:["$12 half-dozen oysters","$22 dozen oysters","$13 signature cocktails","$11 wine","$7–9 beer"],note:"4.6★ Thai seafood restaurant by Andy Ricker protégé. Clam-shell ceviche, Thai oyster sauce mussels. One of NYC's best Thai restaurants"},
+"the-jeffrey":{name:"The Jeffrey",lat:40.7762,lng:-73.9529,hood:"Upper East Side",addr:"311 E 60th St",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$1 oysters (paired with $6 draft beers)","$6 draft beers","$10 cocktails"],note:"4.6★ Brilliant UES happy hour: $1 oysters + $6 draft beer. Sit on the backyard patio under the tram overhead. One of NYC's best HH oyster deals"},
+"sakagura":{name:"Sakagura",lat:40.7531,lng:-73.9715,hood:"Midtown East",addr:"211 E 43rd St, Lower Level",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$5 cups of junmai sake (at bar)","$10 Sapporo draft","Discounted sashimi","Discounted karaage"],note:"4.7★ Hidden underground through an office building lobby. World-class sake list. Sake flights $30–100. Japanese snacks. Dress code: smart casual"},
+"vin-sur-vingt":{name:"Vin Sur Vingt",lat:40.7301,lng:-73.9899,hood:"West Village",addr:"249 W 10th St",days:[1,2,3,4,5],sH:16,eH:18,label:"Mon–Fri 4–6PM",deals:["$7 house red/white/rosé","$6 select beers","$9 rotating French apéritifs (Lillet, Suze)"],note:"4.5★ French wine bar. Candlelit, exposed brick. Daily rotating apéritif list. European atmosphere, ideal date spot"},
+"bar-belly-les":{name:"Bar Belly",lat:40.7161,lng:-73.9919,hood:"Lower East Side",addr:"14 Orchard St",days:[1,2,3,4,5,6,0],sH:17,eH:19,label:"Daily 5–7PM",deals:["$1 oysters (max 12 per person)","$14 cocktails","$10 wines (red, white, bubbly)","$6 beers","Live music most nights"],note:"4.7★ $1 oysters daily during happy hour. East Side cocktail + oyster bar. Live jazz. Top US cocktail bar nominee 2023. Best Jackalope Spritz"},
+"dynamo-room":{name:"The Dynamo Room",lat:40.7504,lng:-73.9958,hood:"Midtown / Penn Station",addr:"130 W 31st St",days:[1,2,3,4,5,6,0],sH:16,eH:18,label:"Daily 4–6PM",deals:["$13.95 select cocktails","$12.95 wine","$5.95 beer","Discounted snacks + raw bar","$29.95 Dynamo Trio: dirty martini + Caesar salad + beef fat fries"],note:"4.5★ From Sunday in Brooklyn / Rule of Thirds team. The NYC Happy Meal ($29.95: martini + Caesar + fries) is the best lunch deal in Midtown"},
+"raines-law-room":{name:"Raines Law Room",lat:40.7436,lng:-73.9914,hood:"Chelsea",addr:"48 W 17th St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["Cocktails from $15","No menu — bartenders create to your taste","Pressed service buttons at cozy booths"],note:"4.7★ Intimate speakeasy with velvet drapes and cozy booths. Press a button to order. Meaghan Dorman's legendary cocktail program. True NYC icon"},
+"mary-les":{name:"Mary's Bar",lat:40.7185,lng:-73.9876,hood:"Lower East Side",addr:"146 Orchard St",days:[1,2,3,4,5,6,0],sH:17,eH:20,label:"Daily 5–8PM",deals:["$12 cocktails (3/4 regular price)","$6 draft beers","$10 wine","Pitchers of beer and cocktails available"],note:"4.5★ New LES neighborhood bar from The Commissioner (Park Slope) team. Xmas lights, disco ball, great pub food. Pitcher-friendly — chill vibes"},
+"ten-bells":{name:"The Ten Bells",lat:40.7198,lng:-73.9929,hood:"Lower East Side",addr:"247 Broome St",days:[1,2,3,4,5,6,0],sH:16,eH:20,label:"Daily 4–8PM",deals:["$9 natural wines by glass","$10 select cocktails","$6 draft beers","Snacks available"],note:"4.6★ LES staple for 15+ years. Beautiful back garden patio. Better food than most wine bars need. Rotating natural wine list, warm regular crowd"},
+"sid-and-the-kids":{name:"Sid & the Kids (Sidney's Five)",lat:40.7262,lng:-73.9972,hood:"NoHo / Soho",addr:"1 Crosby St",days:[1,2,3,4,5,6,0],sH:17,eH:19,label:"Daily 5–7PM",deals:["$1.50 clams","$2 shrimp and oysters","$4 beers","$10 martinis","$5 unlimited popcorn"],note:"4.6★ Best new restaurant of 2021. Raw bar with build-your-own plates. $1.50 clams + $2 shrimp + oysters. Incredible value"},
+"golden-ratio":{name:"Golden Ratio",lat:40.7295,lng:-73.9981,hood:"West Village",addr:"232 W 14th St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$12 cocktails","Foraged pine needle distillate cocktails","Natural wine and aperitivo selection"],note:"4.6★ Nordic-inspired cocktail lounge. New on Time Out's Best NYC Bars 2026 list. Unusual ingredients: foraged pine, mountain botanicals. Intimate"},
+"justines-wv":{name:"Justine's",lat:40.7339,lng:-74.0047,hood:"West Village",addr:"99 Seventh Ave South",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM (Apero Hour)",deals:["$10 wines (European imports)","$12 spritz cocktails","Small plates available"],note:"4.6★ Filipino-inflected West Village bar. Owner's family imports European wines — excellent bottles at great prices. Interesting Filipino-accented snacks"},
+
+// ── 4.5★+ HIGH-RATED ADDITIONS ──
+"employees-only":{name:"Employees Only",lat:40.7341,lng:-74.0050,hood:"West Village",addr:"510 Hudson St",days:[1,2,3,4,5],sH:15,eH:19,label:"Mon–Fri 3–7PM",deals:["$12 classic cocktails","$8 wines","$7 beers"],note:"4.6★ James Beard Award-winning cocktail bar. Famous for Gin Gin Mule, diner food until 3:30AM"},
+"katana-kitten":{name:"Katana Kitten",lat:40.7346,lng:-74.0042,hood:"West Village",addr:"531 Hudson St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$12 Japanese cocktails","$8 draft beer","$10 sake"],note:"4.7★ World's 50 Best Bars. Japanese-inspired cocktails — Mezcal Sakura, Japanese Old Fashioned"},
+"death-and-co":{name:"Death & Company",lat:40.7264,lng:-73.9824,hood:"East Village",addr:"433 E 6th St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$14 signature cocktails","$9 beers","$12 wines"],note:"4.6★ Iconic NYC cocktail bar. Bartenders craft drinks to your taste — no menu needed"},
+"attaboy":{name:"Attaboy",lat:40.7180,lng:-73.9877,hood:"Lower East Side",addr:"134 Eldridge St",days:[1,2,3,4,5],sH:18,eH:20,label:"Mon–Fri 6–8PM",deals:["$15 bespoke cocktails","No menu — bartender creates to your taste"],note:"4.7★ No-menu speakeasy. One of the best cocktail bars in the world"},
+"bar-goto":{name:"Bar Goto",lat:40.7218,lng:-73.9872,hood:"Lower East Side",addr:"245 Eldridge St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$12 signature cocktails","$8 Japanese beer","$10 sake flights"],note:"4.6★ Japanese cocktail bar. Cherry Blossom Martini, Sakura Gimlet, okashi snacks"},
+"superbueno":{name:"Superbueno",lat:40.7198,lng:-73.9861,hood:"Lower East Side",addr:"199 Chrystie St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$14 signature cocktails","$9 Modelo","$12 wine"],note:"4.7★ #2 World's Best Bars North America 2024. Blackened margarita, Mole Negroni, Green Mango Martini"},
+"mr-purple":{name:"Mr. Purple",lat:40.7226,lng:-73.9878,hood:"Lower East Side",addr:"180 Orchard St 15th Fl",days:[1,2,3,4],sH:16,eH:19,label:"Mon–Wed 4–7PM",deals:["$11 cocktails","$11 wines","$6 bar snacks"],note:"4.5★ Rooftop bar with panoramic Manhattan views. Under 21 welcome until 9PM"},
+"la-caverna":{name:"La Caverna",lat:40.7221,lng:-73.9880,hood:"Lower East Side",addr:"122 Rivington St",days:[3,5,0],sH:17,eH:20,label:"Wed, Fri, Sun 5–8PM",deals:["$3 tacos (Tuesdays)","$6 beers","$8 margaritas","$50 bottomless marg dinner Thu"],note:"4.6★ Massive underground cave bar. Taco Tuesdays $3 tacos. Bottomless margarita dinners Thursdays"},
+"bar-moga":{name:"Bar Moga",lat:40.7207,lng:-73.9858,hood:"Lower East Side",addr:"128 Forsyth St",days:[1,2,3,4,5],sH:18,eH:20,label:"Mon–Fri 6–8PM",deals:["$15 signature cocktails","$12 wines","Japanese whiskey flights"],note:"4.6★ Japanese speakeasy cocktail bar. Shochu, Japanese whiskey, intimate vibe"},
+"amor-y-amargo":{name:"Amor y Amargo",lat:40.7278,lng:-73.9822,hood:"East Village",addr:"443 E 6th St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$12 bitters-forward cocktails","$8 amaro flights","$6 low-ABV options"],note:"4.7★ Tiny bitters bar — Manhattan's most singular drinking experience. Menus change daily"},
+"el-camino":{name:"El Camino",lat:40.7264,lng:-73.9815,hood:"East Village",addr:"594 E 11th St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$10 short martini","$14 cocktails","Bar nuts included"],note:"4.6★ From the Electric Burrito team. $10 short martini — one of NYC's best HH deals"},
+"slowly-shirley":{name:"Slowly Shirley",lat:40.7342,lng:-74.0031,hood:"West Village",addr:"121 W 10th St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$10 select cocktails","$8 wine","$7 draft beers"],note:"4.5★ Basement cocktail lounge. Star Wars memorabilia, dance floor, library lounge — eclectic WV gem"},
+"jungle-bird":{name:"Jungle Bird",lat:40.7425,lng:-74.0001,hood:"Chelsea",addr:"174 8th Ave",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$14 craft cocktails","$5 Thai Chili Chickpeas"],note:"4.6★ Tropical cocktail bar. La Bailadora (reposado), Like A Prayer (blanco tequila)"},
+"turnmill":{name:"Turnmill",lat:40.7448,lng:-73.9882,hood:"NoMad",addr:"27 W 24th St",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$14 martinis","$18 martini + fries","$8 margarita","$5 select beer","$2 off well drinks"],note:"4.5★ Spacious NoMad sports tavern. Big booths, tons of TVs — best for groups"},
+"the-lions":{name:"The Lions",lat:40.7259,lng:-73.9816,hood:"East Village",addr:"132 W Houston St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$10 cocktails","$8 select beers","$9 wines"],note:"4.5★ Famous for the best burger in the East Village"},
+"buvette":{name:"Buvette",lat:40.7331,lng:-74.0038,hood:"West Village",addr:"42 Grove St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$10 house wines","$12 spritz","$14 cocktails"],note:"4.6★ Parisian wine bar. Croque monsieur, charcuterie, natural wines — tiny and romantic"},
+"gramercy-tavern-bar":{name:"Gramercy Tavern Bar",lat:40.7383,lng:-73.9887,hood:"Gramercy",addr:"42 E 20th St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$12 cocktails","$10 wines","$8 beers"],note:"4.8★ Danny Meyer's iconic tavern. Walk-in front bar. Award-winning cocktails + seasonal American food"},
+"milady-soho":{name:"Milady's",lat:40.7233,lng:-74.0012,hood:"SoHo",addr:"160 Prince St",days:[1,2,3,4,5,6,0],sH:12,eH:20,label:"Daily until 8PM",deals:["$7 draft beers","$8 wines","$10 cocktails"],note:"4.6★ Beloved SoHo neighborhood bar. All-day happy hour weekdays. Great burgers"},
+"harta":{name:"Harta",lat:40.7527,lng:-73.9784,hood:"Midtown East",addr:"27 E 39th St",days:[1,2,3,4,5],sH:16,eH:18,label:"Mon–Fri 4–6PM",deals:["$12 cocktails","$10 wines","$8 beers","Mediterranean small plates"],note:"4.6★ Apicii group. Mediterranean-inspired. Top Midtown after-work spot"},
+"rosevale":{name:"Rosevale Kitchen",lat:40.7598,lng:-73.9895,hood:"Theater District",addr:"339 W 44th St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$9 draft beer (reg $11)","$12 cocktails","$10 wines","Negroni HH 7PM upstairs"],note:"4.5★ Theater District gem. World-class vermouth selection. Negroni HH upstairs from 7PM"},
+"asset-bar":{name:"Asset Bar",lat:40.7848,lng:-73.9793,hood:"Upper West Side",addr:"2254 Columbus Ave",days:[1,2,3,4,5,6,0],sH:17,eH:19,label:"Daily 5–7PM",deals:["$10 cocktails — any on menu","Small plates from $10"],note:"4.6★ Sparkling Grapefruit and Lychee Island Elixir are must-orders. Great cocktail menu"},
+"maison-premiere":{name:"Maison Premiere",lat:40.7184,lng:-73.9582,hood:"Lower East Side",addr:"298 Bedford Ave",days:[1,2,3,4,5],sH:16,eH:18,label:"Mon–Fri 4–6PM",deals:["$1.50 oysters","$12 absinthe cocktails","$10 wines"],note:"4.7★ New Orleans-style absinthe parlor. James Beard nominated. $1.50 oysters, stunning garden"},
+"le-dive":{name:"Le Dive",lat:40.7256,lng:-73.9982,hood:"SoHo",addr:"179 MacDougal St",days:[1,2,3,4,5,6,0],sH:16,eH:19,label:"Daily 4–7PM",deals:["$9 natural wines","$8 draft beers","$12 cocktails"],note:"4.7★ French-inspired natural wine dive. Fantastic rotating bottles, unpretentious vibe"},
+"gem-wine":{name:"Gem Wine",lat:40.7263,lng:-73.9834,hood:"East Village",addr:"98 Avenue B",days:[1,2,3,4,5,6,0],sH:17,eH:20,label:"Daily 5–8PM",deals:["$12 wines by glass","$8 beers","$14 cocktails"],note:"4.7★ Acclaimed natural wine bar. East Village wine destination — constantly rotating interesting pours"},
+"osamil":{name:"Osamil",lat:40.7396,lng:-73.9903,hood:"Flatiron",addr:"32 W 22nd St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$12 Spanish cocktails","$10 wines","Tapas from $8"],note:"4.6★ Spanish small plates and natural wines. Gambas al ajillo, patatas bravas, jamón"},
+"refinery-rooftop":{name:"Refinery Rooftop",lat:40.7531,lng:-73.9869,hood:"Midtown",addr:"63 W 38th St Rooftop",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$12 cocktails","$10 wines","$8 beers","Appetizers"],note:"4.6★ Panoramic Midtown skyline rooftop. Perfect for client entertaining"},
+"gu-japanese":{name:"Gu Japanese Fusion",lat:40.7570,lng:-73.9692,hood:"Midtown East",addr:"155 E 52nd St",days:[1,2,3,4,5,6,0],sH:15,eH:22,label:"Daily 3–10PM",deals:["50% off select cocktails, beer & wine","$6 lychee-tini","$8–10 signature cocktails"],note:"4.5★ Best HH window in NYC — 7 hours daily. 50% off drinks. Sushi, sashimi, Japanese fusion"},
+"viv-thai":{name:"Viv Thai",lat:40.7607,lng:-73.9926,hood:"Hell's Kitchen",addr:"717 9th Ave",days:[1,2,3,4,5,6,0],sH:12,eH:19,label:"Daily 12–7PM",deals:["$8 cocktails (reg $15)","$8 wines","$8 martinis"],note:"4.5★ Stylish Thai bar in HK. 7-hour daily HH. Lychee martini is a must. Gold neon dragon décor"},
+"stout-nyc":{name:"Stout NYC",lat:40.7548,lng:-73.9849,hood:"Midtown",addr:"133 W 33rd St",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$6 draft beers","$9 cocktails","$8 wines","$5 well drinks"],note:"4.5★ Massive craft beer bar near Penn Station. 40+ taps, great for large groups"},
+"nomad-bar":{name:"The NoMad Bar",lat:40.7450,lng:-73.9881,hood:"NoMad",addr:"10 W 28th St",days:[1,2,3,4,5],sH:17,eH:19,label:"Mon–Fri 5–7PM",deals:["$13 cocktails","$9 wines","$8 beers"],note:"4.5★ Sophisticated hotel bar. Daniel Humm's elegant library bar setting"},
+"long-room":{name:"The Long Room",lat:40.7514,lng:-73.9882,hood:"Midtown",addr:"520 8th Ave",days:[1,2,3,4,5],sH:16,eH:19,label:"Mon–Fri 4–7PM",deals:["$8 cocktails","$6 beers","$7 wines"],note:"4.5★ Chic bar with impressive whiskey selection and modern American cuisine"},
+"pearl-oyster-bar":{name:"Pearl Oyster Bar",lat:40.7329,lng:-74.0035,hood:"West Village",addr:"18 Cornelia St",days:[1,2,3,4,5],sH:17,eH:18,label:"Mon–Fri 5–6PM (bar only)",deals:["$2 off oysters","$10 wines","$12 cocktails"],note:"4.6★ Classic WV seafood institution. Famous lobster roll. Bar seats are walk-in only"},
+};
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let googleMap = null;
+let placesService = null;
+let allVenues = [];       // merged Places + HH data
+let mapMarkers = {};      // placeId -> google.maps.Marker
+let selVenue = null;
+let curView = 'map';
+let fNow = true;
+let fHHOnly = false;
+let fDays = new Set();
+let fHood = '';
+let menuCache = {}; // kept for scraper compatibility
+let nextPageToken = null;
+let searchPending = false;
+
+// Search grid: cover Manhattan with overlapping circles
+const SEARCH_CENTERS = [
+  {lat:40.7580,lng:-73.9855,label:"Midtown"},
+  {lat:40.7282,lng:-73.9942,label:"Downtown"},
+  {lat:40.7830,lng:-73.9700,label:"Upper Manhattan"},
+  {lat:40.7489,lng:-74.0048,label:"West Side"},
+  {lat:40.7489,lng:-73.9680,label:"East Side"},
+];
+let searchIdx = 0;
+
+// ═══════════════════════════════════════════════════════════
+// STARTUP — auto-load with embedded key
+// ═══════════════════════════════════════════════════════════
+const GKEYS = [
+  'AIzaSyC4wScw6cTn4eIg5ERvmQrGC2qab5GRdys',
+  'AIzaSyDgFWH-UwZ8I9ORACsVOkcQBkQYzD6KK9o',
+];
+let gkeyIdx = 0;
+
+window.initGoogleMaps = () => { initGoogleMap(); };
+
+function loadGoogleMaps(keyIdx) {
+  // Remove any previous failed script
+  const old = document.getElementById('gmaps-script');
+  if (old) old.remove();
+  const script = document.createElement('script');
+  script.id = 'gmaps-script';
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${GKEYS[keyIdx]}&libraries=places&callback=initGoogleMaps&v=weekly`;
+  script.onerror = () => {
+    console.warn('Key', keyIdx, 'failed, trying next...');
+    if (keyIdx + 1 < GKEYS.length) loadGoogleMaps(keyIdx + 1);
+    else document.getElementById('map-loading-txt').textContent = 'Map failed to load. Check API keys.';
+  };
+  document.head.appendChild(script);
+}
+
+loadGoogleMaps(0);
+
+// ═══════════════════════════════════════════════════════════
+// GOOGLE MAP INIT
+// ═══════════════════════════════════════════════════════════
+function initGoogleMap() {
+  googleMap = new google.maps.Map(document.getElementById('gmap'), {
+    center: {lat:40.754, lng:-73.984},
+    zoom: 13,
+    mapTypeId: 'roadmap',
+    styles: [
+      {elementType:'geometry',stylers:[{color:'#1a1a2e'}]},
+      {elementType:'labels.text.fill',stylers:[{color:'#746855'}]},
+      {elementType:'labels.text.stroke',stylers:[{color:'#242f3e'}]},
+      {featureType:'administrative.locality',elementType:'labels.text.fill',stylers:[{color:'#d59563'}]},
+      {featureType:'poi',elementType:'labels.text.fill',stylers:[{color:'#d59563'}]},
+      {featureType:'poi.park',elementType:'geometry',stylers:[{color:'#263c3f'}]},
+      {featureType:'poi.park',elementType:'labels.text.fill',stylers:[{color:'#6b9a76'}]},
+      {featureType:'road',elementType:'geometry',stylers:[{color:'#38414e'}]},
+      {featureType:'road',elementType:'geometry.stroke',stylers:[{color:'#212a37'}]},
+      {featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#9ca5b3'}]},
+      {featureType:'road.highway',elementType:'geometry',stylers:[{color:'#746855'}]},
+      {featureType:'road.highway',elementType:'geometry.stroke',stylers:[{color:'#1f2835'}]},
+      {featureType:'road.highway',elementType:'labels.text.fill',stylers:[{color:'#f3d19c'}]},
+      {featureType:'transit',elementType:'geometry',stylers:[{color:'#2f3948'}]},
+      {featureType:'transit.station',elementType:'labels.text.fill',stylers:[{color:'#d59563'}]},
+      {featureType:'water',elementType:'geometry',stylers:[{color:'#17263c'}]},
+      {featureType:'water',elementType:'labels.text.fill',stylers:[{color:'#515c6d'}]},
+      {featureType:'water',elementType:'labels.text.stroke',stylers:[{color:'#17263c'}]},
+    ],
+    disableDefaultUI: true,
+    zoomControl: true,
+    zoomControlOptions: { position: google.maps.ControlPosition.BOTTOM_RIGHT },
+    gestureHandling: 'greedy',
+  });
+
+  placesService = new google.maps.places.PlacesService(googleMap);
+
+  // Populate hood dropdown from HH data
+  const sel = document.getElementById('hood-sel');
+  [...new Set(Object.values(HH_DATA).map(b=>b.hood))].sort().forEach(h=>{
+    const o=document.createElement('option'); o.value=h; o.textContent=h; sel.appendChild(o);
+  });
+
+  // Pre-load our curated bars as venues
+  Object.entries(HH_DATA).forEach(([id, hh]) => {
+    // Parse rating from note field if present (e.g. "4.6★")
+    const noteRating = hh.note ? (hh.note.match(/^(\d+\.\d+)★/) || [])[1] : null;
+    allVenues.push({ id, name: hh.name, addr: hh.addr, hood: hh.hood, hh, placeId: null, lat: hh.lat||null, lng: hh.lng||null, rating: noteRating ? parseFloat(noteRating) : null, numRatings: null, openNow: null, hours: null });
+  });
+
+  updateSubtitle();
+  applyFilters();
+
+  // Start searching for real places
+  searchNextCenter();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PLACES SEARCH — scan Manhattan in a grid
+// ═══════════════════════════════════════════════════════════
+function searchNextCenter() {
+  if (searchIdx >= SEARCH_CENTERS.length) {
+    finishSearch();
+    return;
+  }
+  const c = SEARCH_CENTERS[searchIdx];
+  document.getElementById('map-loading-txt').textContent = `Searching ${c.label}…`;
+  placesService.nearbySearch({
+    location: {lat: c.lat, lng: c.lng},
+    radius: 1800,
+    type: 'bar',
+    keyword: 'bar restaurant',
+  }, (results, status, pagination) => {
+    if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+      mergeResults(results);
+    }
+    // Get page 2 & 3 for each center (up to 60 results)
+    if (pagination && pagination.hasNextPage) {
+      setTimeout(() => {
+        pagination.nextPage();
+      }, 1200);
+    } else {
+      searchIdx++;
+      if (searchIdx < SEARCH_CENTERS.length) {
+        setTimeout(searchNextCenter, 400);
+      } else {
+        finishSearch();
+      }
+    }
+  });
+}
+
+function finishSearch() {
+  document.getElementById('map-loading').classList.add('gone');
+  updateSubtitle();
+  applyFilters();
+  if (curView === 'map') renderMapMarkers();
+  // Fetch live ratings for any venues the grid search didn't match
+  fetchMissingRatings();
+}
+
+// Fetch live Google ratings for venues not matched by nearbySearch
+function fetchMissingRatings() {
+  const unmatched = allVenues.filter(v => !v.placeId && v.name);
+  if (!unmatched.length || !placesService) return;
+
+  let idx = 0;
+  const BATCH = 5; // process 5 at a time to avoid rate limits
+
+  function processBatch() {
+    const batch = unmatched.slice(idx, idx + BATCH);
+    if (!batch.length) return;
+    idx += BATCH;
+
+    batch.forEach(venue => {
+      placesService.findPlaceFromQuery({
+        query: `${venue.name} ${venue.addr || ''} Manhattan NYC`,
+        fields: ['place_id', 'name', 'rating', 'user_ratings_total', 'geometry']
+      }, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && results && results[0]) {
+          const p = results[0];
+          venue.placeId = p.place_id;
+          if (p.rating) venue.rating = p.rating;
+          if (p.user_ratings_total) venue.numRatings = p.user_ratings_total;
+          if (p.geometry) {
+            venue.lat = p.geometry.location.lat();
+            venue.lng = p.geometry.location.lng();
+          }
+          applyFilters();
+          if (curView === 'map') renderMapMarkers();
+        }
+      });
+    });
+
+    // Process next batch after delay
+    if (idx < unmatched.length) setTimeout(processBatch, 800);
+  }
+
+  // Start after a short delay so the main UI is already rendered
+  setTimeout(processBatch, 1500);
+}
+
+function mergeResults(results) {
+  results.forEach(place => {
+    if (!place.geometry) return;
+    const pid = place.place_id;
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+    const pname = place.name;
+
+    // Try to match with our curated HH data by name similarity
+    let matchedHH = null;
+    let matchedId = null;
+    const pnl = pname.toLowerCase().replace(/[^a-z0-9]/g,'');
+    for (const [id, hh] of Object.entries(HH_DATA)) {
+      const hnl = hh.name.toLowerCase().replace(/[^a-z0-9]/g,'');
+      if (pnl === hnl || pnl.includes(hnl) || hnl.includes(pnl) ||
+          levenshtein(pnl, hnl) <= 3) {
+        matchedHH = hh;
+        matchedId = id;
+        break;
+      }
+    }
+
+    // Update existing curated venue with real coords
+    if (matchedId && matchedHH) {
+      const existing = allVenues.find(v=>v.id===matchedId);
+      if (existing) {
+        existing.placeId = pid;
+        existing.lat = lat;
+        existing.lng = lng;
+        existing.rating = place.rating;
+        existing.numRatings = place.user_ratings_total;
+        existing.openNow = place.opening_hours?.isOpen?.();
+        return;
+      }
+    }
+
+    // Add new venue from Places if not already in list
+    if (!allVenues.find(v=>v.placeId===pid)) {
+      allVenues.push({
+        id: pid, name: pname, addr: place.vicinity, hood: '', hh: null,
+        placeId: pid, lat, lng, rating: place.rating, numRatings: place.user_ratings_total,
+        openNow: place.opening_hours?.isOpen?.(), hours: null,
+      });
+    }
+  });
+
+  applyFilters();
+  if (curView === 'map') renderMapMarkers();
+}
+
+// Simple Levenshtein for fuzzy name matching
+function levenshtein(a, b) {
+  const m=a.length, n=b.length;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════════════
+function isHHOpen(venue) {
+  if (!venue.hh) return false;
+  const n=new Date(), d=n.getDay(), h=n.getHours()+n.getMinutes()/60;
+  return venue.hh.days.includes(d) && h>=venue.hh.sH && h<(venue.hh.eH>=24?24:venue.hh.eH);
+}
+function isBusinessOpen(venue) {
+  if (venue.openNow !== null) return venue.openNow;
+  return null; // unknown
+}
+function getFilterTime() {
+  const v=document.getElementById('time-input').value;
+  if (!v) return null;
+  const [h,m]=v.split(':').map(Number);
+  return h+m/60;
+}
+function venuePasses(v) {
+  const q=document.getElementById('q').value.trim().toLowerCase();
+  if (q && !v.name.toLowerCase().includes(q) && !v.hood.toLowerCase().includes(q) && !(v.addr||'').toLowerCase().includes(q) && !(v.hh?.note||'').toLowerCase().includes(q) && !(v.hh?.deals||[]).some(d=>d.toLowerCase().includes(q))) return false;
+  if (fHood && v.hood !== fHood) return false;
+  if (fHHOnly && !v.hh) return false;
+  if (fNow) { return isHHOpen(v) || isBusinessOpen(v) !== false; }
+  const fd = fDays.size>0?[...fDays]:null;
+  const ft = getFilterTime();
+  if (fd || ft!==null) {
+    if (!v.hh) return !fHHOnly;
+    const days = fd||[0,1,2,3,4,5,6];
+    return days.some(d=>{
+      if (!v.hh.days.includes(d)) return false;
+      if (ft===null) return true;
+      return ft>=v.hh.sH && ft<(v.hh.eH>=24?24:v.hh.eH);
+    });
+  }
+  return true;
+}
+function getFiltered() {
+  return allVenues.filter(venuePasses).sort((a,b)=>{
+    const ao=isHHOpen(a), bo=isHHOpen(b);
+    if (ao!==bo) return ao?-1:1;
+    const ah=!!a.hh, bh=!!b.hh;
+    if (ah!==bh) return ah?-1:1;
+    return a.name.localeCompare(b.name);
+  });
+}
+
+function toggleNow(){
+  fNow=!fNow;
+  document.getElementById('pill-now').classList.toggle('on',fNow);
+  if(fNow){fDays.clear();document.getElementById('time-input').value='';[0,1,2,3,4,5,6].forEach(d=>document.getElementById('pill-'+d).classList.remove('on'));document.getElementById('time-pill').classList.remove('on');document.getElementById('tpl').textContent='At time';}
+  applyFilters();
+}
+function toggleHHOnly(){
+  fHHOnly=!fHHOnly;
+  document.getElementById('pill-hh').classList.toggle('on',fHHOnly);
+  applyFilters();
+}
+function toggleDay(d){
+  fNow=false; document.getElementById('pill-now').classList.remove('on');
+  const el=document.getElementById('pill-'+d);
+  if(fDays.has(d)){fDays.delete(d);el.classList.remove('on');}else{fDays.add(d);el.classList.add('on');}
+  applyFilters();
+}
+function focusTime(){document.getElementById('time-input').showPicker?.();document.getElementById('time-input').focus();}
+function onTimeChange(){
+  fNow=false; document.getElementById('pill-now').classList.remove('on');
+  const v=document.getElementById('time-input').value;
+  document.getElementById('time-pill').classList.toggle('on',!!v);
+  document.getElementById('tpl').style.display=v?'none':'';
+  applyFilters();
+}
+function onHoodChange(){
+  fHood=document.getElementById('hood-sel').value;
+  document.getElementById('hood-lbl').textContent=fHood||'📍 Area';
+  document.getElementById('hood-pill').classList.toggle('on',!!fHood);
+  applyFilters();
+}
+function applyFilters(){
+  renderList();
+  if(curView==='map') renderMapMarkers();
+}
+
+// ═══════════════════════════════════════════════════════════
+// LIST
+// ═══════════════════════════════════════════════════════════
+function updateSubtitle(){
+  const hhOpen=allVenues.filter(v=>v.hh&&isHHOpen(v)).length;
+  const total=allVenues.length;
+  const withRatings=allVenues.filter(v=>v.rating).length;
+  const now=new Date();
+  const timeStr=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  document.getElementById('subtitle').innerHTML=`${hhOpen} HH open now · ${total} venues · <span style="color:var(--accent)" title="Live ratings from Google Places API">⭐ ${withRatings} live ratings as of ${timeStr}</span>`;
+}
+function renderList(){
+  const venues=getFiltered();
+  const inner=document.getElementById('list-inner');
+  if(!venues.length){inner.innerHTML='<div class="empty">No venues match — try adjusting filters</div>';return;}
+  inner.innerHTML=venues.slice(0,60).map(v=>{
+    const hhOpen=isHHOpen(v);
+    const bizOpen=isBusinessOpen(v);
+    return `<div class="bar-item" onclick="openDetail('${v.id}')">
+      <div class="bar-dot-wrap"><div class="bar-dot${hhOpen?' open':bizOpen?' open':''}"></div></div>
+      <div class="bar-info">
+        ${v.hh?'<div class="hh-badge">HH</div>':''}
+        <div class="bar-name">${v.name}</div>
+        <div class="bar-sub">${v.hood||v.addr||'Manhattan'}${v.rating?` · <span style="color:var(--accent)">★${v.rating}</span> <span style="color:var(--text-3)">(${(v.numRatings||0).toLocaleString()})</span>`:''}</div>
+        <div class="bar-deal">${v.hh?v.hh.deals[0]:'Bar / Restaurant'}</div>
+      </div>
+      <div class="bar-right">
+        ${hhOpen?'<div class="open-tag">HH OPEN</div>':bizOpen?`<div class="open-tag">OPEN</div>`:bizOpen===false?'<div class="next-tag">Closed</div>':''}
+        ${hhOpen||bizOpen?`<div class="next-tag">${v.hh?v.hh.label:''}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAP MARKERS (Google Maps)
+// ═══════════════════════════════════════════════════════════
+function markerColor(v, selected) {
+  if (selected) return '#ffffff';
+  if (isHHOpen(v)) return '#4ade80';
+  if (v.hh) return '#fb923c';
+  return '#3b82f6';
+}
+function markerBg(v, selected) {
+  if (selected) return '#1a73e8';
+  if (isHHOpen(v)) return '#14532d';
+  if (v.hh) return '#431407';
+  return '#1e3a5f';
+}
+
+function renderMapMarkers() {
+  if (!googleMap) return;
+  const filtered = new Set(getFiltered().filter(v=>v.lat && v.hh).map(v=>v.id));
+
+  // Remove stale
+  Object.keys(mapMarkers).forEach(id=>{
+    if (!filtered.has(id)) { mapMarkers[id].setMap(null); delete mapMarkers[id]; }
+  });
+
+  // Add/update
+  allVenues.filter(v=>v.lat && v.hh && filtered.has(v.id)).forEach(v=>{
+    const sel = selVenue?.id === v.id;
+    if (mapMarkers[v.id]) {
+      mapMarkers[v.id].setIcon(makeGMarkerIcon(v, sel));
+      mapMarkers[v.id].setZIndex(sel ? 999 : v.hh ? 10 : 1);
+    } else {
+      const m = new google.maps.Marker({
+        position: {lat:v.lat, lng:v.lng},
+        map: googleMap,
+        icon: makeGMarkerIcon(v, sel),
+        title: v.name,
+        zIndex: v.hh ? 10 : 1,
+      });
+      m.addListener('click', () => selectVenue(v));
+      mapMarkers[v.id] = m;
+    }
+  });
+}
+
+function makeGMarkerIcon(v, selected) {
+  const color = markerColor(v, selected);
+  const bg = markerBg(v, selected);
+  const sz = selected ? 20 : v.hh ? 16 : 12;
+  return {
+    path: google.maps.SymbolPath.CIRCLE,
+    fillColor: selected ? '#1a73e8' : isHHOpen(v) ? '#4ade80' : v.hh ? '#fb923c' : '#3b82f6',
+    fillOpacity: selected ? 1 : 0.9,
+    strokeColor: selected ? '#fff' : '#0a0a0a',
+    strokeWeight: selected ? 3 : 1.5,
+    scale: sz,
+  };
+}
+
+function selectVenue(v) {
+  selVenue = v;
+  renderMapMarkers();
+  googleMap.panTo({lat:v.lat, lng:v.lng});
+  const hhOpen = isHHOpen(v);
+  document.getElementById('sh-name').textContent = v.name;
+  document.getElementById('sh-hood').textContent = (v.hood||v.addr||'Manhattan') + (v.rating ? ` · ★${v.rating} (${(v.numRatings||0).toLocaleString()})` : '');
+  document.getElementById('sh-hh').textContent = v.hh ? (hhOpen?'🟢 ':'')+v.hh.label : '';
+  document.getElementById('sh-deal').textContent = v.hh ? v.hh.deals[0] : 'Bar / Restaurant';
+  document.getElementById('sheet').classList.add('up');
+}
+function closeSheet(){ document.getElementById('sheet').classList.remove('up'); selVenue=null; renderMapMarkers(); }
+function openDetailFromSheet(){ if(selVenue) openDetail(selVenue.id); }
+
+// ═══════════════════════════════════════════════════════════
+// VIEW SWITCH
+// ═══════════════════════════════════════════════════════════
+function setView(v){
+  curView=v;
+  document.getElementById('btn-list').classList.toggle('on',v==='list');
+  document.getElementById('btn-map').classList.toggle('on',v==='map');
+  document.getElementById('list-pane').classList.toggle('gone',v!=='list');
+  document.getElementById('map-pane').classList.toggle('on',v==='map');
+  if(v==='map'){
+    setTimeout(()=>{
+      if(googleMap){
+        google.maps.event.trigger(googleMap,'resize');
+        googleMap.setCenter(googleMap.getCenter());
+        renderMapMarkers();
+      }
+    }, 150);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DETAIL
+// ═══════════════════════════════════════════════════════════
+function openDetail(id) {
+  const v = allVenues.find(x=>x.id===id);
+  if (!v) return;
+  selVenue = v;
+  const hhOpen = isHHOpen(v);
+  const bizOpen = isBusinessOpen(v);
+  const st = document.getElementById('d-status');
+  st.className='d-status'+(hhOpen||bizOpen?' open':'');
+  st.innerHTML = hhOpen ? '<span class="pulse"></span> HH Open now'
+    : bizOpen ? '<span class="pulse"></span> Open now'
+    : bizOpen===false ? 'Closed now' : '';
+
+  let hoursHtml = '';
+  if (v.hh) {
+    hoursHtml = `
+      <hr class="d-div">
+      <div class="d-sec">
+        <div class="d-lbl">Happy Hour</div>
+        <div class="d-hh-box">
+          <div class="d-hh-time">🍹 ${v.hh.label}</div>
+          <div class="d-days">${DAYS_LABELS.map((d,i)=>`<span class="d-day${v.hh.days.includes(i)?' on':''}">${d}</span>`).join('')}</div>
+          <div class="d-deals">${v.hh.deals.map(d=>`<div class="d-deal"><span class="d-deal-t">${d}</span></div>`).join('')}</div>
+        </div>
+      </div>`;
+  } else {
+    hoursHtml = `
+      <hr class="d-div">
+      <div class="d-sec">
+        <div class="d-lbl">Happy Hour</div>
+        <div class="no-hh">No happy hour data for this venue yet.</div>
+      </div>`;
+  }
+
+  let menuHtml = '';
+  if (v.hh) {
+    const website = v.hh.website;
+    menuHtml = `
+    <hr class="d-div">
+    <div class="d-sec" id="menu-wrap">
+      <div class="d-lbl">Menu</div>
+      ${REAL_MENUS[v.id] ? `
+        <div class="mtabs">
+          ${REAL_MENUS[v.id].map((tab,i)=>`<button class="mtab${i===0?' on':''}" onclick="switchRealTab(event,'${v.id}',${i})">${tab.label}</button>`).join('')}
+        </div>
+        <div id="real-menu-body">${renderRealTab(v.id, 0)}</div>
+      ` : website ? `
+        <a href="${website}/menus" target="_blank" class="menu-btn" style="text-decoration:none">
+          <span>📋 View menu on their website</span><span style="color:var(--accent)">↗</span>
+        </a>
+      ` : `
+        <button class="menu-btn" onclick="searchMenu('${v.id}')">
+          <span>🔍 Search their menu online</span><span style="color:var(--accent)">↗</span>
+        </button>
+      `}
+    </div>`; 
+  }
+
+  document.getElementById('d-body').innerHTML = `
+    <div class="d-hero">
+      <h1 class="d-name"><a href="${v.placeId ? `https://www.google.com/maps/place/?q=place_id:${v.placeId}` : `https://www.google.com/maps/search/${encodeURIComponent(v.name+' '+v.addr+' New York')}`}" target="_blank" style="color:inherit;text-decoration:none">${v.name} <span style="font-size:16px;opacity:0.4">↗</span></a></h1>
+      <div class="d-meta">
+        <span class="d-addr">${v.hood ? v.hood+' · ' : ''}${v.addr||'Manhattan'}</span>
+        ${v.rating?`<span class="d-rating">★ ${v.rating} <span style="color:var(--text-3)">(${(v.numRatings||0).toLocaleString()})</span></span>`:''}
+      </div>
+      ${v.hh?.note?`<div class="d-note">${v.hh.note}</div>`:''}
+    </div>
+    ${hoursHtml}
+    ${menuHtml}
+    <hr class="d-div">
+    <div class="maps-row">
+      <a class="maps-btn" href="https://maps.apple.com/?q=${encodeURIComponent(v.name+' '+v.addr+' New York')}" target="_blank">🗺 Apple Maps</a>
+      <a class="maps-btn" href="https://www.google.com/maps${v.placeId?'/place/?q=place_id:'+v.placeId:'/search/'+encodeURIComponent(v.name+' '+v.addr+' New York')}" target="_blank">📍 Google Maps</a>
+    </div>
+  `;
+
+  // Fetch live details for Places venues
+  if (v.placeId && !v._detailsFetched) {
+    v._detailsFetched = true;
+    placesService.getDetails({ placeId: v.placeId, fields: ['opening_hours','formatted_phone_number','website','rating','user_ratings_total'] }, (place, status) => {
+      if (status !== google.maps.places.PlacesServiceStatus.OK || !place) return;
+      v.openNow = place.opening_hours?.isOpen?.();
+      v.hours = place.opening_hours?.weekday_text;
+      v.phone = place.formatted_phone_number;
+      v.website = place.website;
+      if (place.rating) v.rating = place.rating;
+      if (place.user_ratings_total) v.numRatings = place.user_ratings_total;
+      // Update detail if still open
+      if (selVenue?.id === v.id) {
+        const hr = document.getElementById('d-body');
+        if (hr && v.hours) {
+          const today = new Date().getDay();
+          const existing = document.getElementById('live-hours');
+          if (!existing) {
+            const hoursBlock = document.createElement('div');
+            hoursBlock.id = 'live-hours';
+            hoursBlock.innerHTML = `<hr class="d-div"><div class="d-sec"><div class="d-lbl">Hours (Google)</div><div class="d-hours-list">${v.hours.map((row,i)=>`<div class="d-hour-row${i===((today+6)%7)?' today':''}"><span class="d-hour-day">${row.split(':')[0]}</span><span class="d-hour-time">${row.split(':').slice(1).join(':').trim()}</span></div>`).join('')}</div></div>`;
+            hr.appendChild(hoursBlock);
+          }
+        }
+      }
+    });
+  }
+
+  const det=document.getElementById('detail');
+  det.classList.add('open');
+  det.scrollTop=0;
+}
+
+function closeDetail(){ document.getElementById('detail').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════════════════
+// WEBSITE URLs — sourced from each bar's official site
+// ═══════════════════════════════════════════════════════════
+const WEBSITES = {
+  "dollys": "https://www.dollys51.com",
+  "sir-henrys": "https://www.sirhenrysnyc.com",
+  "the-dickens": "https://www.thedickensnyc.com",
+  "haswell-greens": "https://www.haswellgreens.com",
+  "marseille": "https://www.marseillenyc.com",
+  "russian-vodka-room": "https://russianvodkaroomnyc.com",
+  "ardesia": "https://www.ardesia-ny.com",
+  "mercury-bar": "https://www.mercurybarnyc.com",
+  "waylon": "https://www.waylonnyc.com",
+  "rudys": "https://rudysbarnyc.com",
+  "golden-hof": "https://www.goldenhofnyc.com",
+  "rum-house": "https://www.therumhousenyc.com",
+  "valerie": "https://www.valerienyc.com",
+  "havana-central": "https://www.havanacentral.com",
+  "old-town-bar": "https://oldtownbarnyc.com",
+  "la-nacional": "https://www.lanacionaltapasbar.com",
+  "magic-hour": "https://www.magichourrooftop.com",
+  "half-king": "https://www.thehalfking.com",
+  "porchlight": "https://www.porchlightbar.com",
+  "dante-wv": "https://www.dante-nyc.com",
+  "dante-gv": "https://www.dante-nyc.com",
+  "stonewall-inn": "https://www.thestonewallinnnyc.com",
+  "amelie-gv": "https://www.amelienyc.com",
+  "miss-lilys": "https://www.misslilysnyc.com",
+  "the-wayland": "https://www.thewaylandnyc.com",
+  "mermaid-inn": "https://www.themermaidnyc.com",
+  "verlaine": "https://www.verlainenyc.com",
+  "cervos": "https://www.cervosnyc.com",
+  "mr-purple": "https://www.mrpurplenyc.com",
+  "spring-lounge": "https://springlounge.com",
+  "roxy-bar": "https://www.roxyhotelnyc.com/food-drink/roxy-bar",
+  "the-odeon": "https://www.theodeonrestaurant.com",
+  "dead-rabbit": "https://thedeadrabbit.com",
+  "pier-a": "https://www.piera.com",
+  "fraunces-tavern": "https://frauncestavernrestaurant.com",
+  "tao-downtown": "https://www.taorestaurant.com",
+  "mollys-shebeen": "https://www.mollysdivebarnyc.com",
+  "penrose": "https://www.penrosebar.com",
+  "amelie-uws": "https://www.amelienyc.com",
+  "jakes-dilemma": "https://www.jakesdilemma.com",
+  "red-rooster": "https://www.redroosterharlem.com",
+  "vinateria": "https://www.vinateriaharlem.com",
+  "harlem-tavern": "https://www.harlemtavern.com",
+  "the-heights": "https://www.theheightsbarnyc.com",
+};
+
+// ═══════════════════════════════════════════════════════════
+// REAL MENU DATA — sourced directly from bar websites
+// ═══════════════════════════════════════════════════════════
+
+// REAL_MENUS loaded dynamically from menus.json (auto-updated daily)
+let REAL_MENUS = {};
+let menusLastUpdated = null;
+
+async function loadMenus() {
+  try {
+    const res = await fetch('menus.json?v=' + Date.now());
+    if (!res.ok) throw new Error('menus.json not found');
+    const data = await res.json();
+    REAL_MENUS = data.menus || {};
+    menusLastUpdated = data.updatedAt;
+    console.log(`Menus loaded: ${Object.keys(REAL_MENUS).length} venues, updated ${menusLastUpdated}`);
+    // Show last updated badge
+    const badge = document.getElementById('menus-updated');
+    if (badge && menusLastUpdated) {
+      const d = new Date(menusLastUpdated);
+      badge.textContent = `Menus updated ${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})} at ${d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
+      badge.style.display = 'inline';
+    }
+    // Re-render if a detail panel is open
+    if (selVenue) openDetail(selVenue.id);
+  } catch (e) {
+    console.warn('Could not load menus.json, using fallback:', e.message);
+  }
+}
+
+// Load menus on startup
+loadMenus();
+
+function renderRealTab(vid, tabIdx) {
+  const menu = REAL_MENUS[vid];
+  if (!menu || !menu[tabIdx]) return '';
+  return menu[tabIdx].cats.map(cat => `
+    <div class="mcat">
+      <div class="mcat-name">${cat.cat}</div>
+      ${cat.items.map(item => `
+        <div class="mitem">
+          <div class="mitem-l">
+            <span class="mitem-n">${item.name}</span>
+            ${item.desc ? `<span class="mitem-d">${item.desc}</span>` : ''}
+          </div>
+          <span class="mitem-p">${item.price}</span>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function switchRealTab(e, vid, tabIdx) {
+  const menu = REAL_MENUS[vid];
+  if (!menu) return;
+  const tabs = e.target.closest('.mtabs').querySelectorAll('.mtab');
+  tabs.forEach((t,i) => t.classList.toggle('on', i===tabIdx));
+  const body = document.getElementById('real-menu-body');
+  if (body) body.innerHTML = renderRealTab(vid, tabIdx);
+}
+
+async function searchMenu(vid) {
+  const v = allVenues.find(x=>x.id===vid);
+  const wrap = document.getElementById('menu-wrap');
+  // Just open Google search for their menu
+  window.open(`https://www.google.com/search?q=${encodeURIComponent(v.name+' '+v.addr+' NYC menu')}`, '_blank');
+}
+// ═══════════════════════════════════════════════════════════
+// AI SCRAPER ADMIN PANEL
+// ═══════════════════════════════════════════════════════════
+function openScraper() {
+  document.getElementById('scraper-panel').classList.add('open');
+}
+function closeScraper() {
+  document.getElementById('scraper-panel').classList.remove('open');
+}
+
+async function scrapeBar() {
+  const name = document.getElementById('sc-name').value.trim();
+  const url = document.getElementById('sc-url').value.trim();
+  if (!name) { alert('Enter a bar name'); return; }
+
+  const btn = document.getElementById('sc-btn');
+  btn.disabled = true; btn.textContent = 'Searching…';
+  document.getElementById('sc-result').innerHTML = '<div class="menu-spin"><div class="spinner"></div></div>';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{
+          role: 'user',
+          content: `Search for the happy hour details for "${name}" bar in Manhattan, New York City. ${url ? `Their website may be ${url}.` : ''}
+
+Find:
+1. Their exact happy hour schedule (days and hours)
+2. Specific happy hour drink prices and food deals
+3. Their address
+4. A short description of the vibe/specialty
+
+Return ONLY raw JSON (no markdown):
+{
+  "name": "exact bar name",
+  "addr": "street address",
+  "hood": "neighborhood",
+  "website": "website url or empty string",
+  "lat": null,
+  "lng": null,
+  "days": [array of day numbers, 0=Sun 1=Mon ... 6=Sat],
+  "sH": start hour as decimal (e.g. 16 for 4pm, 16.5 for 4:30pm),
+  "eH": end hour as decimal,
+  "label": "human readable schedule e.g. Mon-Fri 4-7PM",
+  "deals": ["specific deal 1 with price", "specific deal 2 with price"],
+  "note": "1-2 sentence description of the bar",
+  "confidence": "high/medium/low based on how confident you are in the data"
+}`
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const fullText = (data.content||[]).map(c => c.type==='text' ? c.text : '').join('');
+    const clean = fullText.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+
+    document.getElementById('sc-result').innerHTML = `
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:#e0e0e0;margin-bottom:4px">${parsed.name}</div>
+        <div style="font-size:11px;color:#444;margin-bottom:8px">${parsed.addr} · ${parsed.hood} · Confidence: <span style="color:${parsed.confidence==='high'?'#4ade80':parsed.confidence==='medium'?'#fb923c':'#ef4444'}">${parsed.confidence}</span></div>
+        <div style="font-size:12px;color:#4ade80;margin-bottom:4px">${parsed.label}</div>
+        <div style="font-size:11px;color:#333;margin-bottom:8px">${parsed.deals?.join(' · ')}</div>
+        <div style="font-size:11px;color:var(--text-2);margin-bottom:12px">${parsed.note}</div>
+        <button onclick="addScrapedBar(${JSON.stringify(JSON.stringify(parsed))})" style="width:100%;padding:10px;background:#4ade80;border:none;border-radius:8px;color:#0a0a0a;font-size:13px;font-weight:700;cursor:pointer">Add to App ✓</button>
+      </div>`;
+  } catch(e) {
+    document.getElementById('sc-result').innerHTML = `<div style="color:#ef4444;font-size:12px;padding:12px 0">Error: ${e.message}</div>`;
+  }
+
+  btn.disabled = false; btn.textContent = 'Search & Extract →';
+}
+
+function addScrapedBar(jsonStr) {
+  try {
+    const bar = JSON.parse(jsonStr);
+    const id = bar.name.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-');
+    if (allVenues.find(v=>v.id===id)) { alert('Bar already exists!'); return; }
+    HH_DATA[id] = bar;
+    allVenues.push({ id, name:bar.name, addr:bar.addr, hood:bar.hood, hh:bar,
+      placeId:null, lat:bar.lat||null, lng:bar.lng||null,
+      rating:null, numRatings:null, openNow:null, hours:null });
+    applyFilters();
+    updateSubtitle();
+    alert(`✓ Added ${bar.name}! It now appears in the list.`);
+    document.getElementById('sc-name').value = '';
+    document.getElementById('sc-url').value = '';
+    document.getElementById('sc-result').innerHTML = '';
+  } catch(e) { alert('Error adding bar: '+e.message); }
+}
+
+// Kick off refresh every minute
+setInterval(()=>{updateSubtitle();applyFilters();},60000);
+</script>
+</body>
+</html>
