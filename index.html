@@ -756,8 +756,6 @@ let searchPending = false;
 
 // Search grid: cover Manhattan with overlapping circles
 // SEARCH_CENTERS removed — using DISCOVERY_GRID instead
-let discoveryIdx = 0; // for background discovery
-
 // ═══════════════════════════════════════════════════════════
 // STARTUP — auto-load with embedded key
 // ═══════════════════════════════════════════════════════════
@@ -1414,7 +1412,7 @@ let menusLastUpdated = null;
 
 async function loadMenus() {
   try {
-    const res = await fetch('menus.json?v=' + Date.now());
+    const res = await fetch('https://raw.githubusercontent.com/mihirdatta7/HappyHourMVP/main/menus.json?v=' + Date.now());
     if (!res.ok) throw new Error('menus.json not found');
     const data = await res.json();
     REAL_MENUS = data.menus || {};
