@@ -879,42 +879,69 @@ function fetchAllRatings() {
 // ═══════════════════════════════════════════════════════════
 // DISCOVERY — find new venues not in curated list
 // ═══════════════════════════════════════════════════════════
-const DISCOVERY_GRID = [
-  {lat:40.7580,lng:-73.9855,label:"Midtown W"},{lat:40.7540,lng:-73.9750,label:"Midtown E"},
-  {lat:40.7430,lng:-74.0080,label:"Chelsea"},{lat:40.7410,lng:-73.9990,label:"Flatiron"},
-  {lat:40.7360,lng:-74.0050,label:"West Village"},{lat:40.7282,lng:-73.9942,label:"Greenwich Vill"},
-  {lat:40.7260,lng:-73.9890,label:"East Village"},{lat:40.7200,lng:-73.9850,label:"LES"},
-  {lat:40.7230,lng:-74.0080,label:"Tribeca"},{lat:40.7080,lng:-74.0110,label:"FiDi"},
-  {lat:40.7820,lng:-73.9800,label:"UWS"},{lat:40.7770,lng:-73.9550,label:"UES"},
-  {lat:40.8100,lng:-73.9500,label:"Harlem"},{lat:40.7490,lng:-74.0080,label:"Hudson Yards"},
-  {lat:40.7230,lng:-73.9980,label:"SoHo"},{lat:40.7640,lng:-73.9900,label:"HK North"},
-  {lat:40.7490,lng:-73.9730,label:"Murray Hill"},{lat:40.7380,lng:-73.9930,label:"Gramercy"},
-];
-let discoveryIdx = 0;
+// ─── Exhaustive Manhattan grid ───
+// Covers lat 40.700–40.878, lng -74.020 to -73.910
+// ~450m spacing = full coverage with overlap
+const DISCOVERY_GRID = (function() {
+  const pts = [];
+  // Manhattan bounding box with coast-aware clipping
+  for (let lat = 40.700; lat <= 40.878; lat = Math.round((lat + 0.004) * 1000) / 1000) {
+    // lng extent varies by latitude (Manhattan is diagonal)
+    const lngMin = lat > 40.780 ? -73.990 : lat > 40.740 ? -74.010 : -74.022;
+    const lngMax = lat > 40.820 ? -73.930 : lat > 40.780 ? -73.940 : lat > 40.740 ? -73.960 : -73.960;
+    for (let lng = lngMin; lng <= lngMax; lng = Math.round((lng + 0.005) * 1000) / 1000) {
+      pts.push({lat: Math.round(lat*10000)/10000, lng: Math.round(lng*10000)/10000});
+    }
+  }
+  return pts;
+})();
+
+// Search both bars and restaurants in two passes
+const DISCOVERY_TYPES = ['bar', 'restaurant'];
+let discoveryPtIdx = 0;
+let discoveryTypeIdx = 0;
+let discoveryIdx = 0; // total calls made
 
 function startDiscovery() {
   if (!placesService) return;
+  console.log(`Starting exhaustive discovery: ${DISCOVERY_GRID.length * DISCOVERY_TYPES.length} searches`);
   discoverNext();
 }
 
 function discoverNext() {
-  if (discoveryIdx >= DISCOVERY_GRID.length) return;
-  const c = DISCOVERY_GRID[discoveryIdx++];
+  if (discoveryTypeIdx >= DISCOVERY_TYPES.length) return; // all done
+
+  if (discoveryPtIdx >= DISCOVERY_GRID.length) {
+    // Move to next type
+    discoveryPtIdx = 0;
+    discoveryTypeIdx++;
+    if (discoveryTypeIdx >= DISCOVERY_TYPES.length) return;
+  }
+
+  const c = DISCOVERY_GRID[discoveryPtIdx++];
+  const type = DISCOVERY_TYPES[discoveryTypeIdx];
+
   placesService.nearbySearch({
-    location: {lat: c.lat, lng: c.lng}, radius: 800,
-    type: 'bar', rankBy: google.maps.places.RankBy.PROMINENCE,
-  }, (results, status) => {
+    location: {lat: c.lat, lng: c.lng},
+    radius: 450,
+    type: type,
+  }, (results, status, pagination) => {
     if (status === google.maps.places.PlacesServiceStatus.OK && results) {
       mergeDiscoveryResults(results);
+      // Get page 2 if available (up to 60 results per point)
+      if (pagination && pagination.hasNextPage) {
+        setTimeout(() => pagination.nextPage(), 1000);
+      }
     }
-    if (discoveryIdx < DISCOVERY_GRID.length) setTimeout(discoverNext, 1500);
+    // Next point — throttle to avoid rate limits
+    setTimeout(discoverNext, 350);
   });
 }
 
 function mergeDiscoveryResults(results) {
   let added = false;
   results.forEach(place => {
-    if (!place.geometry || !place.rating || place.rating < 4.2) return;
+    if (!place.geometry || !place.rating || place.rating < 4.0) return;
     const pid = place.place_id;
     if (allVenues.find(v => v.placeId === pid)) return;
     const pnl = place.name.toLowerCase().replace(/[^a-z0-9]/g,'');
@@ -1016,6 +1043,15 @@ function getFilterTime() {
   const [h,m]=v.split(':').map(Number);
   return h+m/60;
 }
+// Only search + hood + hhOnly filters (not time/day) — used for map visibility
+function venuePassesSearchHood(v) {
+  const q=document.getElementById('q').value.trim().toLowerCase();
+  if (q && !v.name.toLowerCase().includes(q) && !(v.hood||'').toLowerCase().includes(q) && !(v.addr||'').toLowerCase().includes(q) && !(v.hh?.note||'').toLowerCase().includes(q) && !(v.hh?.deals||[]).some(d=>d.toLowerCase().includes(q))) return false;
+  if (fHoods.size > 0 && !fHoods.has(v.hood)) return false;
+  if (fHHOnly && !v.hh) return false;
+  return true;
+}
+
 function venuePasses(v) {
   const q=document.getElementById('q').value.trim().toLowerCase();
   if (q && !v.name.toLowerCase().includes(q) && !v.hood.toLowerCase().includes(q) && !(v.addr||'').toLowerCase().includes(q) && !(v.hh?.note||'').toLowerCase().includes(q) && !(v.hh?.deals||[]).some(d=>d.toLowerCase().includes(q))) return false;
@@ -1112,11 +1148,12 @@ function applyFilters(){
 // ═══════════════════════════════════════════════════════════
 function updateSubtitle(){
   const hhOpen=allVenues.filter(v=>v.hh&&isHHOpen(v)).length;
+  const hhTotal=allVenues.filter(v=>v.hh).length;
   const total=allVenues.length;
   const withRatings=allVenues.filter(v=>v.rating).length;
-  const now=new Date();
-  const timeStr=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  document.getElementById('subtitle').innerHTML=`${hhOpen} HH open now · ${total} venues · <span style="color:var(--accent)" title="Live ratings from Google Places API">⭐ ${withRatings} live ratings as of ${timeStr}</span>`;
+  const discoveryDone = discoveryTypeIdx >= DISCOVERY_TYPES.length;
+  const progressPct = discoveryDone ? '' : ` · <span style="color:var(--text-3)">scanning ${Math.round((discoveryPtIdx/DISCOVERY_GRID.length)*100)}%…</span>`;
+  document.getElementById('subtitle').innerHTML=`<span style="color:var(--green)">${hhOpen} HH open</span> · ${hhTotal} with HH · ${total} total${progressPct}`;
 }
 function renderList(){
   const venues=getFiltered();
@@ -1161,19 +1198,21 @@ function markerBg(v, selected, inFilter=true) {
 
 function renderMapMarkers() {
   if (!googleMap) return;
-  // Show ALL venues with coords + HH data (regardless of time filter)
-  // Time filter affects color only, not visibility
-  const timeFiltered = new Set(getFiltered().filter(v=>v.lat && v.hh).map(v=>v.id));
-  const allHH = allVenues.filter(v=>v.lat && v.hh);
 
-  // Remove stale markers (venues no longer in full list)
-  const allHHIds = new Set(allHH.map(v=>v.id));
+  // Venues passing search/hood/hhOnly filters (visible on map)
+  const searchHoodFiltered = new Set(
+    allVenues.filter(v => v.lat && v.hh && venuePassesSearchHood(v)).map(v=>v.id)
+  );
+  // Of those, which also pass the time/day filter (shown bright)
+  const timeFiltered = new Set(getFiltered().filter(v=>v.lat && v.hh).map(v=>v.id));
+
+  // Remove stale markers
   Object.keys(mapMarkers).forEach(id=>{
-    if (!allHHIds.has(id)) { mapMarkers[id].setMap(null); delete mapMarkers[id]; }
+    if (!searchHoodFiltered.has(id)) { mapMarkers[id].setMap(null); delete mapMarkers[id]; }
   });
 
-  // Add/update — all HH venues visible, dimmed if outside time filter
-  allHH.forEach(v=>{
+  // Add/update visible venues, dim those outside time filter
+  allVenues.filter(v=>v.lat && v.hh && searchHoodFiltered.has(v.id)).forEach(v=>{
     const inFilter = timeFiltered.has(v.id);
     const sel = selVenue?.id === v.id;
     const icon = makeGMarkerIcon(v, sel, inFilter);
@@ -1302,9 +1341,12 @@ function openDetail(id) {
     </div>`; 
   }
 
+  const gmapsUrl = v.placeId
+    ? 'https://www.google.com/maps/place/?q=place_id:' + v.placeId
+    : 'https://www.google.com/maps/search/' + encodeURIComponent(v.name+' '+(v.addr||'')+' New York');
   document.getElementById('d-body').innerHTML = `
     <div class="d-hero">
-      <h1 class="d-name"><a href="${v.placeId ? `https://www.google.com/maps/place/?q=place_id:${v.placeId}` : `https://www.google.com/maps/search/${encodeURIComponent(v.name+' '+(v.addr||'')+' New York')}`}" target="_blank" style="color:inherit;text-decoration:none">${v.name} <span style="font-size:16px;opacity:0.4">↗</span></a></h1>
+      <h1 class="d-name"><a href="${gmapsUrl}" target="_blank" style="color:inherit;text-decoration:none">${v.name} <span style="font-size:16px;opacity:0.4">↗</span></a></h1>
       <div class="d-meta">
         <span class="d-addr">${v.hood ? v.hood+' · ' : ''}${v.addr||'Manhattan'}</span>
         ${v.rating?`<span class="d-rating">★ ${v.rating} <span style="color:var(--text-3)">(${(v.numRatings||0).toLocaleString()})</span></span>`:''}
